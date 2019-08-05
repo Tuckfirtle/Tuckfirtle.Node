@@ -25,6 +25,8 @@ namespace Tuckfirtle.Node
 
             DependencyManager.InstallFactory(new ConsoleStreamWriteToFileQueuedTaskLoggerFactoryInstaller(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.log")));
             DependencyManager.InstallFactory(new BootstrapFactoryInstaller());
+            DependencyManager.InstallFactory(new JsonConfigFactoryInstaller(Path.Combine(Environment.CurrentDirectory, "Config.json")));
+            DependencyManager.InstallFactory(new ConsoleBootstrapFactoryInstaller());
 
             DependencyManager.BuildAndExecute((provider, exception) =>
             {
