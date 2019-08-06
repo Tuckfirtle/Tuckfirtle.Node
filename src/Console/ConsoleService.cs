@@ -12,9 +12,9 @@ using TheDialgaTeam.Core.Logger;
 using Tuckfirtle.Core;
 using Tuckfirtle.Node.Config.Model;
 
-namespace Tuckfirtle.Node.Bootstrap.Service
+namespace Tuckfirtle.Node.Console
 {
-    internal sealed class ConsoleBootstrapService : IServiceExecutor
+    internal sealed class ConsoleService : IServiceExecutor
     {
         private IConsoleLogger ConsoleLogger { get; }
 
@@ -24,7 +24,7 @@ namespace Tuckfirtle.Node.Bootstrap.Service
 
         private CancellationTokenSource CancellationTokenSource { get; }
 
-        public ConsoleBootstrapService(IConsoleLogger consoleLogger, IConfig config, ITaskAwaiter taskAwaiter, CancellationTokenSource cancellationTokenSource)
+        public ConsoleService(IConsoleLogger consoleLogger, IConfig config, ITaskAwaiter taskAwaiter, CancellationTokenSource cancellationTokenSource)
         {
             ConsoleLogger = consoleLogger;
             Config = config;
@@ -64,19 +64,21 @@ namespace Tuckfirtle.Node.Bootstrap.Service
                     .WriteLine("", false)
                     .Build());
 
-                Console.CancelKeyPress += (sender, args) =>
+                System.Console.CancelKeyPress += (sender, args) =>
                 {
                     args.Cancel = true;
-                    cancellationTokenSource.Cancel();
                 };
 
                 while (!token.IsCancellationRequested)
                 {
-                    var command = await Console.In.ReadLineAsync().ConfigureAwait(false);
+                    var command = await System.Console.In.ReadLineAsync().ConfigureAwait(false);
 
                     if (command == null)
+                    {
+                        cancellationTokenSource.Cancel();
                         continue;
-
+                    }
+                    
                     if (command.Trim().Equals("help", StringComparison.OrdinalIgnoreCase))
                     {
                         consoleLogger.LogMessage(new ConsoleMessageBuilder()

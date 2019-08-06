@@ -2,6 +2,7 @@
 // 
 // Please see the included LICENSE file for more information.
 
+using System.Net;
 using Tuckfirtle.Core;
 
 namespace Tuckfirtle.Node.Config.Model
@@ -10,8 +11,14 @@ namespace Tuckfirtle.Node.Config.Model
     {
         public NetworkType NetworkType { get; set; } = NetworkType.Testnet;
 
-        public ushort P2PPort { get; set; } = CoreSettings.P2PDefaultPort;
+        public bool UniversalPlugAndPlay { get; set; } = true;
 
-        public ushort RPCPort { get; set; } = CoreSettings.RPCDefaultPort;
+        public string P2PListenerIp { get; set; } = IPAddress.Any.ToString();
+
+        public ushort P2PListenerPort { get; set; } = CoreSettings.P2PDefaultPort;
+
+        public string RPCListenerIp { get; set; } = IPAddress.Any.ToString();
+
+        public ushort RPCListenerPort { get; set; } = CoreSettings.RPCDefaultPort;
     }
 }

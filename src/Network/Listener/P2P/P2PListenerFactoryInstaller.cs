@@ -5,15 +5,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection.Factory;
-using Tuckfirtle.Node.Bootstrap.Service;
 
-namespace Tuckfirtle.Node.Bootstrap.Factory
+namespace Tuckfirtle.Node.Network.Listener.P2P
 {
-    internal sealed class BootstrapFactoryInstaller : IFactoryInstaller
+    internal sealed class P2PListenerFactoryInstaller : IFactoryInstaller
     {
         public void Install(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddInterfacesAsSingleton<BootstrapService>();
+            serviceCollection.AddInterfacesAsSingleton<P2PListenerService>();
         }
     }
 }

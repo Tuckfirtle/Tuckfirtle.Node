@@ -12,9 +12,15 @@ namespace Tuckfirtle.Node.Config
     {
         public NetworkType NetworkType => ConfigModel.NetworkType;
 
-        public ushort P2PPort => ConfigModel.P2PPort;
+        public bool UniversalPlugAndPlay => ConfigModel.UniversalPlugAndPlay;
 
-        public ushort RPCPort => ConfigModel.RPCPort;
+        public string P2PListenerIp => ConfigModel.P2PListenerIp;
+
+        public ushort P2PListenerPort => ConfigModel.P2PListenerPort;
+
+        public string RPCListenerIp => ConfigModel.RPCListenerIp;
+
+        public ushort RPCListenerPort => ConfigModel.RPCListenerPort;
 
         public string ConfigFilePath { get; }
 

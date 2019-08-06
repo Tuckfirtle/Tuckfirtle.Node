@@ -8,7 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
 using TheDialgaTeam.Core.Logger.DependencyInjection.Factory;
-using Tuckfirtle.Node.Bootstrap.Factory;
+using Tuckfirtle.Node.Bootstrap;
+using Tuckfirtle.Node.Config.Json;
+using Tuckfirtle.Node.Console;
+using Tuckfirtle.Node.Network.Listener;
+using Tuckfirtle.Node.Network.Listener.P2P;
 
 namespace Tuckfirtle.Node
 {
@@ -26,11 +30,13 @@ namespace Tuckfirtle.Node
             DependencyManager.InstallFactory(new ConsoleStreamWriteToFileQueuedTaskLoggerFactoryInstaller(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.log")));
             DependencyManager.InstallFactory(new BootstrapFactoryInstaller());
             DependencyManager.InstallFactory(new JsonConfigFactoryInstaller(Path.Combine(Environment.CurrentDirectory, "Config.json")));
-            DependencyManager.InstallFactory(new ConsoleBootstrapFactoryInstaller());
+            DependencyManager.InstallFactory(new ConsoleFactoryInstaller());
+            DependencyManager.InstallFactory(new ListenerFactoryInstaller());
+            DependencyManager.InstallFactory(new P2PListenerFactoryInstaller());
 
             DependencyManager.BuildAndExecute((provider, exception) =>
             {
-                var consoleLogger = provider.GetRequiredService<IConsoleLogger>() ?? new ConsoleStreamLogger(Console.Error);
+                var consoleLogger = provider.GetRequiredService<IConsoleLogger>() ?? new ConsoleStreamLogger(System.Console.Error);
 
                 if (exception is AggregateException aggregateException)
                 {
@@ -49,7 +55,7 @@ namespace Tuckfirtle.Node
                     if (message.Length > 1)
                     {
                         consoleLogger.LogMessage(message);
-                        Console.ReadLine();
+                        System.Console.ReadLine();
                     }
 
                     ExitWithFault();
@@ -61,7 +67,7 @@ namespace Tuckfirtle.Node
                         .WriteLine("Press Enter/Return to exit...")
                         .Build());
 
-                    Console.ReadLine();
+                    System.Console.ReadLine();
 
                     ExitWithFault();
                 }

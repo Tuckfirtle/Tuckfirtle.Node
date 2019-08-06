@@ -6,7 +6,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Tuckfirtle.Node.Config.Model;
 
-namespace Tuckfirtle.Node.Config
+namespace Tuckfirtle.Node.Config.Json
 {
     internal sealed class JsonConfig : Config
     {

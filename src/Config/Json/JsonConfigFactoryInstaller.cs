@@ -5,10 +5,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection.Factory;
-using Tuckfirtle.Node.Bootstrap.Service;
-using Tuckfirtle.Node.Config;
 
-namespace Tuckfirtle.Node.Bootstrap.Factory
+namespace Tuckfirtle.Node.Config.Json
 {
     internal sealed class JsonConfigFactoryInstaller : IFactoryInstaller
     {

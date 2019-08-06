@@ -8,8 +8,14 @@ namespace Tuckfirtle.Node.Config.Model
     {
         NetworkType NetworkType { get; }
 
-        ushort P2PPort { get; }
+        bool UniversalPlugAndPlay { get; }
 
-        ushort RPCPort { get; }
+        string P2PListenerIp { get; }
+
+        ushort P2PListenerPort { get; }
+
+        string RPCListenerIp { get; }
+
+        ushort RPCListenerPort { get; }
     }
 }

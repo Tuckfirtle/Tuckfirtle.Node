@@ -5,15 +5,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection.Factory;
-using Tuckfirtle.Node.Bootstrap.Service;
 
-namespace Tuckfirtle.Node.Bootstrap.Factory
+namespace Tuckfirtle.Node.Console
 {
-    internal sealed class ConsoleBootstrapFactoryInstaller : IFactoryInstaller
+    internal sealed class ConsoleFactoryInstaller : IFactoryInstaller
     {
         public void Install(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddInterfacesAsSingleton<ConsoleBootstrapService>();
+            serviceCollection.AddInterfacesAsSingleton<ConsoleService>();
         }
     }
 }

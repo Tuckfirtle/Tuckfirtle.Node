@@ -6,9 +6,8 @@ using System;
 using System.Threading;
 using TheDialgaTeam.Core.DependencyInjection.Service;
 using TheDialgaTeam.Core.Logger;
-using Tuckfirtle.Node.Config;
 
-namespace Tuckfirtle.Node.Bootstrap.Service
+namespace Tuckfirtle.Node.Config.Json
 {
     internal sealed class JsonConfigService : IServiceExecutor
     {
@@ -41,7 +40,7 @@ namespace Tuckfirtle.Node.Bootstrap.Service
                     .WriteLine("Press Enter/Return to exit...", false)
                     .Build());
 
-                Console.ReadLine();
+                System.Console.ReadLine();
                 CancellationTokenSource.Cancel();
             }
             else

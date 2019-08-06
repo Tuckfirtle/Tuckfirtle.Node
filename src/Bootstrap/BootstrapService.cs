@@ -2,13 +2,12 @@
 // 
 // Please see the included LICENSE file for more information.
 
-using System;
 using System.Reflection;
 using System.Runtime.Versioning;
 using TheDialgaTeam.Core.DependencyInjection.Service;
 using Tuckfirtle.Core;
 
-namespace Tuckfirtle.Node.Bootstrap.Service
+namespace Tuckfirtle.Node.Bootstrap
 {
     internal sealed class BootstrapService : IServiceExecutor
     {
@@ -16,7 +15,7 @@ namespace Tuckfirtle.Node.Bootstrap.Service
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             var frameworkVersion = Assembly.GetExecutingAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName;
-            Console.Title = $"{CoreSettings.CoinFullName} Node v{version} ({frameworkVersion})";
+            System.Console.Title = $"{CoreSettings.CoinFullName} Node v{version} ({frameworkVersion})";
         }
     }
 }
