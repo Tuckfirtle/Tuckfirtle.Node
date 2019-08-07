@@ -8,7 +8,7 @@ using Tuckfirtle.Node.Config.Model;
 
 namespace Tuckfirtle.Node.Config
 {
-    internal abstract class Config : IConfig, IDisposable
+    internal abstract class Config : IConfig, IConfigModel, IDisposable
     {
         public NetworkType NetworkType => ConfigModel.NetworkType;
 
@@ -24,16 +24,13 @@ namespace Tuckfirtle.Node.Config
 
         public string ConfigFilePath { get; }
 
+        public bool IsConfigFileExist => File.Exists(ConfigFilePath);
+
         protected ConfigModel ConfigModel { get; set; } = new ConfigModel();
 
         protected Config(string configFilePath)
         {
             ConfigFilePath = configFilePath;
-        }
-
-        public bool IsConfigFileExist()
-        {
-            return File.Exists(ConfigFilePath);
         }
 
         public abstract void LoadConfig();

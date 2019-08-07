@@ -4,7 +4,7 @@
 
 namespace Tuckfirtle.Node.Config.Model
 {
-    internal interface IConfig
+    internal interface IConfigModel
     {
         NetworkType NetworkType { get; }
 

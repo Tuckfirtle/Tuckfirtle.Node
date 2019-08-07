@@ -18,26 +18,26 @@ namespace Tuckfirtle.Node.Console
     {
         private IConsoleLogger ConsoleLogger { get; }
 
-        private IConfig Config { get; }
+        private IConfigModel ConfigModel { get; }
 
         private ITaskAwaiter TaskAwaiter { get; }
 
         private CancellationTokenSource CancellationTokenSource { get; }
 
-        public ConsoleService(IConsoleLogger consoleLogger, IConfig config, ITaskAwaiter taskAwaiter, CancellationTokenSource cancellationTokenSource)
+        public ConsoleService(IConsoleLogger consoleLogger, IConfigModel configModel, ITaskAwaiter taskAwaiter, CancellationTokenSource cancellationTokenSource)
         {
             ConsoleLogger = consoleLogger;
-            Config = config;
+            ConfigModel = configModel;
             TaskAwaiter = taskAwaiter;
             CancellationTokenSource = cancellationTokenSource;
         }
 
         public void Execute()
         {
-            TaskAwaiter.EnqueueTask((ConsoleLogger, Config, CancellationTokenSource), async (token, state) =>
+            TaskAwaiter.EnqueueTask((ConsoleLogger, ConfigModel, CancellationTokenSource), async (token, state) =>
             {
                 var consoleLogger = state.ConsoleLogger;
-                var config = state.Config;
+                var configModel = state.ConfigModel;
                 var cancellationTokenSource = state.CancellationTokenSource;
 
                 var version = Assembly.GetExecutingAssembly().GetName().Version;

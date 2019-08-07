@@ -36,7 +36,7 @@ namespace Tuckfirtle.Node
 
             DependencyManager.BuildAndExecute((provider, exception) =>
             {
-                var consoleLogger = provider.GetRequiredService<IConsoleLogger>() ?? new ConsoleStreamLogger(System.Console.Error);
+                var consoleLogger = new ConsoleStreamLogger(System.Console.Error);
 
                 if (exception is AggregateException aggregateException)
                 {

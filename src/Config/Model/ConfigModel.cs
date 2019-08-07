@@ -7,7 +7,7 @@ using Tuckfirtle.Core;
 
 namespace Tuckfirtle.Node.Config.Model
 {
-    internal sealed class ConfigModel : IConfig
+    internal sealed class ConfigModel : IConfigModel
     {
         public NetworkType NetworkType { get; set; } = NetworkType.Testnet;
 

@@ -9,23 +9,23 @@ namespace Tuckfirtle.Node.Network.Listener
 {
     internal sealed class ListenerFactory : IListenerFactory
     {
-        private IConfig Config { get; }
+        private IConfigModel ConfigModel { get; }
 
-        public ListenerFactory(IConfig config)
+        public ListenerFactory(IConfigModel configModel)
         {
-            Config = config;
+            ConfigModel = configModel;
         }
 
         public Listener CreateP2PListener()
         {
-            var config = Config;
-            return new Listener(IPAddress.Parse(config.P2PListenerIp), config.P2PListenerPort);
+            var configModel = ConfigModel;
+            return new Listener(IPAddress.Parse(configModel.P2PListenerIp), configModel.P2PListenerPort);
         }
 
         public Listener CreateRPCListener()
         {
-            var config = Config;
-            return new Listener(IPAddress.Parse(config.RPCListenerIp), config.RPCListenerPort);
+            var configModel = ConfigModel;
+            return new Listener(IPAddress.Parse(configModel.RPCListenerIp), configModel.RPCListenerPort);
         }
     }
 }

@@ -18,13 +18,13 @@ namespace Tuckfirtle.Node.Network.Listener.P2P
     {
         private IListenerFactory ListenerFactory { get; }
 
-        private IConfig Config { get; }
+        private IConfigModel Config { get; }
 
         private ITaskAwaiter TaskAwaiter { get; }
 
         private IConsoleLogger ConsoleLogger { get; }
 
-        public P2PListenerService(IListenerFactory listenerFactory, IConfig config, ITaskAwaiter taskAwaiter, IConsoleLogger consoleLogger)
+        public P2PListenerService(IListenerFactory listenerFactory, IConfigModel config, ITaskAwaiter taskAwaiter, IConsoleLogger consoleLogger)
         {
             ListenerFactory = listenerFactory;
             Config = config;
