@@ -5,12 +5,15 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Tuckfirtle.Node.Network.Listener
 {
     internal sealed class Listener : IDisposable
     {
-        public TcpListener TcpListener { get; }
+        public bool IsPendingNewClient => TcpListener?.Pending() ?? false;
+
+        private TcpListener TcpListener { get; }
 
         public Listener(IPAddress ipAddress, ushort port)
         {
@@ -26,6 +29,11 @@ namespace Tuckfirtle.Node.Network.Listener
         public void StopListener()
         {
             TcpListener.Stop();
+        }
+
+        public async Task<TcpClient> AcceptNewClientAsync()
+        {
+            return await TcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
         }
 
         public void Dispose()

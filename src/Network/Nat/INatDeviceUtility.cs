@@ -8,6 +8,8 @@ namespace Tuckfirtle.Node.Network.Nat
 {
     public interface INatDeviceUtility
     {
+        Task DiscoverDeviceAsync();
+
         Task OpenPortAsync(ushort port);
     }
 }

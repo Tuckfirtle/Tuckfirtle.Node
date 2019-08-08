@@ -6,14 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection.Factory;
 
-namespace Tuckfirtle.Node.Network.Nat
+namespace Tuckfirtle.Node.Network.Listener.RPC
 {
-    internal sealed class NatDeviceUtilityFactoryInstaller : IFactoryInstaller
+    internal sealed class RPCListenerFactoryInstaller : IFactoryInstaller
     {
         public void Install(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddInterfacesAsSingleton<NatDeviceUtility>();
-            serviceCollection.AddInterfacesAsSingleton<NatDeviceUtilityService>();
+            serviceCollection.AddInterfacesAsSingleton<RPCListenerService>();
         }
     }
 }

@@ -13,10 +13,19 @@ namespace Tuckfirtle.Node.Network.Nat
     {
         private NatDiscoverer NatDiscoverer { get; } = new NatDiscoverer();
 
+        private NatDevice NatDevice { get; set; }
+
+        public async Task DiscoverDeviceAsync()
+        {
+            NatDevice = await NatDiscoverer.DiscoverDeviceAsync().ConfigureAwait(false);
+        }
+
         public async Task OpenPortAsync(ushort port)
         {
-            var natDevice = await NatDiscoverer.DiscoverDeviceAsync().ConfigureAwait(false);
-            await natDevice.CreatePortMapAsync(new Mapping(Protocol.Tcp, port, port, $"{CoreSettings.CoinFullName} port.")).ConfigureAwait(false);
+            if (NatDevice == null)
+                throw new NatDeviceNotFoundException();
+
+            await NatDevice.CreatePortMapAsync(new Mapping(Protocol.Tcp, port, port, $"{CoreSettings.CoinFullName} port.")).ConfigureAwait(false);
         }
 
         public void Dispose()

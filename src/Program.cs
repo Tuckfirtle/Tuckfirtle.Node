@@ -12,6 +12,7 @@ using Tuckfirtle.Node.Config.Json;
 using Tuckfirtle.Node.Console;
 using Tuckfirtle.Node.Network.Listener;
 using Tuckfirtle.Node.Network.Listener.P2P;
+using Tuckfirtle.Node.Network.Listener.RPC;
 using Tuckfirtle.Node.Network.Nat;
 
 namespace Tuckfirtle.Node
@@ -34,6 +35,7 @@ namespace Tuckfirtle.Node
             DependencyManager.InstallFactory(new NatDeviceUtilityFactoryInstaller());
             DependencyManager.InstallFactory(new ListenerFactoryInstaller());
             DependencyManager.InstallFactory(new P2PListenerFactoryInstaller());
+            DependencyManager.InstallFactory(new RPCListenerFactoryInstaller());
 
             DependencyManager.BuildAndExecute((provider, exception) =>
             {
