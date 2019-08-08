@@ -10,7 +10,7 @@ namespace Tuckfirtle.Node.Network.Listener
 {
     internal sealed class Listener : IDisposable
     {
-        private TcpListener TcpListener { get; }
+        public TcpListener TcpListener { get; }
 
         public Listener(IPAddress ipAddress, ushort port)
         {
