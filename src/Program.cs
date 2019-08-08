@@ -4,7 +4,6 @@
 
 using System;
 using System.IO;
-using Microsoft.Extensions.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
 using TheDialgaTeam.Core.Logger.DependencyInjection.Factory;
@@ -27,7 +26,7 @@ namespace Tuckfirtle.Node
             if (!Directory.Exists(logsDirectory))
                 Directory.CreateDirectory(logsDirectory);
 
-            DependencyManager.InstallFactory(new ConsoleStreamWriteToFileQueuedTaskLoggerFactoryInstaller(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.log")));
+            DependencyManager.InstallFactory(new ConsoleStreamWriteToFileQueueLoggerFactoryInstaller(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.log")));
             DependencyManager.InstallFactory(new BootstrapFactoryInstaller());
             DependencyManager.InstallFactory(new JsonConfigFactoryInstaller(Path.Combine(Environment.CurrentDirectory, "Config.json")));
             DependencyManager.InstallFactory(new ConsoleFactoryInstaller());
