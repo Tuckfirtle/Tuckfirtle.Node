@@ -16,6 +16,12 @@ namespace Tuckfirtle.Node.Network.Nat
     {
         private List<Mapping> PortMappings { get; } = new List<Mapping>();
 
+        public NatDeviceUtility()
+        {
+            // This is a fail safe mechanism in case someone clicked the BIG RED X BUTTON. It should release the port in time.
+            AppDomain.CurrentDomain.ProcessExit += (sender, args) => NatDiscoverer.ReleaseAll();
+        }
+
         public void AddPortMapping(int port)
         {
             PortMappings.Add(new Mapping(Protocol.Tcp, port, port, $"{CoreSettings.CoinFullName} port."));
