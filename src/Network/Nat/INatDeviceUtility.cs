@@ -3,13 +3,14 @@
 // Please see the included LICENSE file for more information.
 
 using System.Threading.Tasks;
+using TheDialgaTeam.Core.Logger;
 
 namespace Tuckfirtle.Node.Network.Nat
 {
-    public interface INatDeviceUtility
+    internal interface INatDeviceUtility
     {
-        Task DiscoverDeviceAsync();
+        void AddPortMapping(int port);
 
-        Task OpenPortAsync(ushort port);
+        Task OpenPortsAsync(IConsoleLogger consoleLogger);
     }
 }

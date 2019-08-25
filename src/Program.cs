@@ -10,10 +10,7 @@ using TheDialgaTeam.Core.Logger.DependencyInjection.Factory;
 using Tuckfirtle.Node.Bootstrap;
 using Tuckfirtle.Node.Config.Json;
 using Tuckfirtle.Node.Console;
-using Tuckfirtle.Node.Network.Listener;
-using Tuckfirtle.Node.Network.Listener.P2P;
-using Tuckfirtle.Node.Network.Listener.RPC;
-using Tuckfirtle.Node.Network.Nat;
+using Tuckfirtle.Node.Network;
 
 namespace Tuckfirtle.Node
 {
@@ -32,10 +29,7 @@ namespace Tuckfirtle.Node
             DependencyManager.InstallFactory(new BootstrapFactoryInstaller());
             DependencyManager.InstallFactory(new JsonConfigFactoryInstaller(Path.Combine(Environment.CurrentDirectory, "Config.json")));
             DependencyManager.InstallFactory(new ConsoleFactoryInstaller());
-            DependencyManager.InstallFactory(new NatDeviceUtilityFactoryInstaller());
-            DependencyManager.InstallFactory(new ListenerFactoryInstaller());
-            DependencyManager.InstallFactory(new P2PListenerFactoryInstaller());
-            DependencyManager.InstallFactory(new RPCListenerFactoryInstaller());
+            DependencyManager.InstallFactory(new NetworkFactoryInstaller());
 
             DependencyManager.BuildAndExecute((provider, exception) =>
             {

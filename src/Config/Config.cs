@@ -16,11 +16,11 @@ namespace Tuckfirtle.Node.Config
 
         public string P2PListenerIp => ConfigModel.P2PListenerIp;
 
-        public ushort P2PListenerPort => ConfigModel.P2PListenerPort;
+        public int P2PListenerPort => ConfigModel.P2PListenerPort;
 
         public string RPCListenerIp => ConfigModel.RPCListenerIp;
 
-        public ushort RPCListenerPort => ConfigModel.RPCListenerPort;
+        public int RPCListenerPort => ConfigModel.RPCListenerPort;
 
         public string ConfigFilePath { get; }
 

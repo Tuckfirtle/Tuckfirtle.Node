@@ -12,10 +12,10 @@ namespace Tuckfirtle.Node.Config.Model
 
         string P2PListenerIp { get; }
 
-        ushort P2PListenerPort { get; }
+        int P2PListenerPort { get; }
 
         string RPCListenerIp { get; }
 
-        ushort RPCListenerPort { get; }
+        int RPCListenerPort { get; }
     }
 }
