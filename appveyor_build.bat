@@ -2,7 +2,7 @@
 
 SETLOCAL 
 
-SET project=src/Tuckfirtle.Node.Builder.csproj
+SET project=src/Tuckfirtle.Node.csproj
 SET configuration=Release
 
 SET framework_core=netcoreapp3.0
