@@ -43,6 +43,13 @@ namespace Tuckfirtle.Node.Console
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
                 var frameworkVersion = Assembly.GetExecutingAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName;
 
+                var test = new byte[330];
+
+                for (var i = 0; i < test.Length; i++)
+                {
+                    test[i] = 50;
+                }
+
                 consoleLogger.LogMessage(new ConsoleMessageBuilder()
                     .WriteLine("", false)
                     .WriteLine("████████╗██╗   ██╗ ██████╗██╗  ██╗███████╗██╗██████╗ ████████╗██╗     ███████╗", false)
