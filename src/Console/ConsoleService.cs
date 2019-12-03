@@ -10,6 +10,7 @@ using TheDialgaTeam.Core.DependencyInjection.Service;
 using TheDialgaTeam.Core.DependencyInjection.TaskAwaiter;
 using TheDialgaTeam.Core.Logger;
 using Tuckfirtle.Core;
+using Tuckfirtle.Core.Blockchain;
 using Tuckfirtle.Node.Config.Model;
 
 namespace Tuckfirtle.Node.Console
@@ -43,13 +44,6 @@ namespace Tuckfirtle.Node.Console
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
                 var frameworkVersion = Assembly.GetExecutingAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName;
 
-                var test = new byte[330];
-
-                for (var i = 0; i < test.Length; i++)
-                {
-                    test[i] = 50;
-                }
-
                 consoleLogger.LogMessage(new ConsoleMessageBuilder()
                     .WriteLine("", false)
                     .WriteLine("████████╗██╗   ██╗ ██████╗██╗  ██╗███████╗██╗██████╗ ████████╗██╗     ███████╗", false)
@@ -61,7 +55,7 @@ namespace Tuckfirtle.Node.Console
                     .WriteLine("", false)
                     .Write(" * ", ConsoleColor.Green, false)
                     .Write("ABOUT".PadRight(13), false)
-                    .Write($"{CoreSettings.CoinFullName} Node/{version} ", ConsoleColor.Cyan, false)
+                    .Write($"{CoreConfiguration.CoinFullName} Node/{version} ", ConsoleColor.Cyan, false)
                     .WriteLine(frameworkVersion, false)
                     .Write(" * ", ConsoleColor.Green, false)
                     .Write("COMMANDS".PadRight(13), false)
@@ -70,6 +64,9 @@ namespace Tuckfirtle.Node.Console
                     .WriteLine("to get a list of commands.", false)
                     .WriteLine("", false)
                     .Build());
+
+                var test = new Account();
+                ConsoleLogger.LogMessage(test.AccountAddress);
 
                 System.Console.CancelKeyPress += (sender, args) =>
                 {

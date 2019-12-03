@@ -15,7 +15,7 @@ namespace Tuckfirtle.Node.Bootstrap
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             var frameworkVersion = Assembly.GetExecutingAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName;
-            System.Console.Title = $"{CoreSettings.CoinFullName} Node v{version} ({frameworkVersion})";
+            System.Console.Title = $"{CoreConfiguration.CoinFullName} Node v{version} ({frameworkVersion})";
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Tuckfirtle.Node.Network.Nat
 
         public void AddPortMapping(int port)
         {
-            PortMappings.Add(new Mapping(Protocol.Tcp, port, port, $"{CoreSettings.CoinFullName} port."));
+            PortMappings.Add(new Mapping(Protocol.Tcp, port, port, $"{CoreConfiguration.CoinFullName} port."));
         }
 
         public async Task OpenPortsAsync(IConsoleLogger consoleLogger)

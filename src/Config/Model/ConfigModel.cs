@@ -15,10 +15,10 @@ namespace Tuckfirtle.Node.Config.Model
 
         public string P2PListenerIp { get; set; } = IPAddress.Any.ToString();
 
-        public int P2PListenerPort { get; set; } = CoreSettings.P2PDefaultPort;
+        public int P2PListenerPort { get; set; } = CoreConfiguration.P2PDefaultPort;
 
         public string RPCListenerIp { get; set; } = IPAddress.Any.ToString();
 
-        public int RPCListenerPort { get; set; } = CoreSettings.RPCDefaultPort;
+        public int RPCListenerPort { get; set; } = CoreConfiguration.RPCDefaultPort;
     }
 }
