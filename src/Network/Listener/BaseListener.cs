@@ -5,7 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
@@ -83,6 +85,25 @@ namespace Tuckfirtle.Node.Network.Listener
         }
 
         protected abstract void AcceptTcpClient(TcpClient tcpClient);
+
+        private async Task<IPAddress> GetPublicIpAddressAsync()
+        {
+            try
+            {
+                using var httpClient = new HttpClient();
+                
+                var request = await httpClient.GetAsync("https://api.ipify.org", new CancellationTokenSource(10000).Token).ConfigureAwait(false);
+                request.EnsureSuccessStatusCode();
+
+                var response = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                return IPAddress.TryParse(response, out var result) ? result : IPAddress.None;
+            }
+            catch (Exception)
+            {
+                return IPAddress.None;
+            }
+        }
 
         public void Dispose()
         {
