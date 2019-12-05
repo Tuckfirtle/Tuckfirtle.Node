@@ -3,30 +3,26 @@
 // Please see the included LICENSE file for more information.
 
 using System;
-using System.IO;
-using Tuckfirtle.Node.Config.Model;
+using System.Net;
+using Tuckfirtle.Core;
 
 namespace Tuckfirtle.Node.Config
 {
-    internal abstract class Config : IConfig, IConfigModel, IDisposable
+    internal abstract class Config : IConfig, IDisposable
     {
-        public NetworkType NetworkType => ConfigModel.NetworkType;
+        public NetworkType NetworkType { get; set; } = NetworkType.Testnet;
 
-        public bool UniversalPlugAndPlay => ConfigModel.UniversalPlugAndPlay;
+        public bool UniversalPlugAndPlay { get; set; } = true;
 
-        public string P2PListenerIp => ConfigModel.P2PListenerIp;
+        public string P2PListenerIp { get; set; } = IPAddress.Any.ToString();
 
-        public int P2PListenerPort => ConfigModel.P2PListenerPort;
+        public int P2PListenerPort { get; set; } = CoreConfiguration.P2PDefaultPort;
 
-        public string RPCListenerIp => ConfigModel.RPCListenerIp;
+        public string RPCListenerIp { get; set; } = IPAddress.Any.ToString();
 
-        public int RPCListenerPort => ConfigModel.RPCListenerPort;
+        public int RPCListenerPort { get; set; } = CoreConfiguration.RPCDefaultPort;
 
         public string ConfigFilePath { get; }
-
-        public bool IsConfigFileExist => File.Exists(ConfigFilePath);
-
-        protected ConfigModel ConfigModel { get; set; } = new ConfigModel();
 
         protected Config(string configFilePath)
         {

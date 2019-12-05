@@ -3,21 +3,20 @@
 // Please see the included LICENSE file for more information.
 
 using Microsoft.Extensions.DependencyInjection;
+using Open.Nat;
 using TheDialgaTeam.Core.DependencyInjection;
-using TheDialgaTeam.Core.DependencyInjection.Factory;
 using Tuckfirtle.Node.Network.Listener;
-using Tuckfirtle.Node.Network.Nat;
 
 namespace Tuckfirtle.Node.Network
 {
-    internal sealed class NetworkFactoryInstaller : IFactoryInstaller
+    internal sealed class NetworkServiceInstaller : IServiceInstaller
     {
-        public void Install(IServiceCollection serviceCollection)
+        public void InstallService(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddInterfacesAsSingleton<NatDeviceUtility>();
+            serviceCollection.AddInterfacesAndSelfAsSingleton<NatDiscoverer>();
             serviceCollection.AddInterfacesAsSingleton<P2PListener>();
             serviceCollection.AddInterfacesAsSingleton<RPCListener>();
-            serviceCollection.AddInterfacesAsSingleton<NetworkService>();
+            serviceCollection.AddInterfacesAsSingleton<NetworkServiceExecutor>();
         }
     }
 }

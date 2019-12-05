@@ -4,14 +4,14 @@
 
 using System.Reflection;
 using System.Runtime.Versioning;
-using TheDialgaTeam.Core.DependencyInjection.Service;
+using TheDialgaTeam.Core.DependencyInjection;
 using Tuckfirtle.Core;
 
 namespace Tuckfirtle.Node.Bootstrap
 {
-    internal sealed class BootstrapService : IServiceExecutor
+    internal sealed class BootstrapServiceExecutor : IServiceExecutor
     {
-        public void Execute()
+        public void ExecuteService(ITaskAwaiter taskAwaiter)
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             var frameworkVersion = Assembly.GetExecutingAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName;

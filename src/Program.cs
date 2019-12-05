@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
-using TheDialgaTeam.Core.Logger.DependencyInjection.Factory;
+using TheDialgaTeam.Core.Logger.DependencyInjection.Installer;
 using Tuckfirtle.Node.Bootstrap;
 using Tuckfirtle.Node.Config.Json;
 using Tuckfirtle.Node.Console;
@@ -25,11 +25,11 @@ namespace Tuckfirtle.Node
             if (!Directory.Exists(logsDirectory))
                 Directory.CreateDirectory(logsDirectory);
 
-            DependencyManager.InstallFactory(new ConsoleStreamWriteToFileQueueLoggerFactoryInstaller(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.log")));
-            DependencyManager.InstallFactory(new BootstrapFactoryInstaller());
-            DependencyManager.InstallFactory(new JsonConfigFactoryInstaller(Path.Combine(Environment.CurrentDirectory, "Config.json")));
-            DependencyManager.InstallFactory(new ConsoleFactoryInstaller());
-            DependencyManager.InstallFactory(new NetworkFactoryInstaller());
+            DependencyManager.InstallService(new ConsoleStreamWriteToFileQueueLoggerServiceInstaller(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.log")));
+            DependencyManager.InstallService(new BootstrapServiceInstaller());
+            DependencyManager.InstallService(new JsonConfigServiceInstaller(Path.Combine(Environment.CurrentDirectory, "Config.json")));
+            DependencyManager.InstallService(new ConsoleServiceInstaller());
+            DependencyManager.InstallService(new NetworkServiceInstaller());
 
             DependencyManager.BuildAndExecute((provider, exception) =>
             {

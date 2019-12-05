@@ -7,59 +7,80 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using TheDialgaTeam.Core.DependencyInjection.TaskAwaiter;
+using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
-using Tuckfirtle.Node.Config.Model;
-using Tuckfirtle.Node.Network.Nat;
+using Tuckfirtle.Node.Config;
 
 namespace Tuckfirtle.Node.Network.Listener
 {
     internal abstract class BaseListener : IListener, IDisposable
     {
-        protected abstract string ListenerType { get; }
+        public abstract string ListenerType { get; }
+
+        public abstract IPAddress ListenerIpAddress { get; }
+
+        public abstract int ListenerPort { get; }
+
+        private IConfig Config { get; }
+
+        private IConsoleLogger ConsoleLogger { get; }
+
+        private ITaskAwaiter TaskAwaiter { get; }
 
         private TcpListener TcpListener { get; set; }
 
         private List<TcpClient> TcpClients { get; } = new List<TcpClient>();
 
-        public void InitializeListener(IConfigModel configModel, INatDeviceUtility natDeviceUtility)
+        protected BaseListener(IConfig config, IConsoleLogger consoleLogger, ITaskAwaiter taskAwaiter)
         {
-            TcpListener = new TcpListener(IPAddress.Any, configModel.P2PListenerPort);
-            TcpListener.AllowNatTraversal(true);
-
-            natDeviceUtility.AddPortMapping(RequiredPortMapping(configModel));
+            Config = config;
+            ConsoleLogger = consoleLogger;
+            TaskAwaiter = taskAwaiter;
         }
 
-        public void StartListener(ITaskAwaiter taskAwaiter, IConsoleLogger consoleLogger)
+        public void StartListener()
         {
-            taskAwaiter.EnqueueTask((TcpListener, consoleLogger), async (cancellationToken, state) =>
+            TaskAwaiter.EnqueueTask((TcpListener, ConsoleLogger), async (cancellationToken, state) =>
             {
                 var listener = state.TcpListener;
-                
-                state.consoleLogger.LogMessage($"Started listening for {ListenerType} connections.", ConsoleColor.Green);
+                var consoleLogger = state.ConsoleLogger;
 
-                while (!cancellationToken.IsCancellationRequested)
+                try
                 {
-                    if (listener.Pending())
-                    {
-                        var tcpClient = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
+                    listener.Start();
+                    consoleLogger.LogMessage($"Started listening for {ListenerType} connections.", ConsoleColor.Green);
 
-                        TcpClients.Add(tcpClient);
-                        AcceptTcpClient(tcpClient);
-                    }
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        if (listener.Pending())
+                        {
+                            var tcpClient = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
 
-                    try
-                    {
-                        await Task.Delay(1, cancellationToken).ConfigureAwait(false);
+                            TcpClients.Add(tcpClient);
+                            AcceptTcpClient(tcpClient);
+                        }
+
+                        try
+                        {
+                            await Task.Delay(1, cancellationToken).ConfigureAwait(false);
+                        }
+                        catch (TaskCanceledException)
+                        {
+                        }
                     }
-                    catch (TaskCanceledException)
-                    {
-                    }
+                }
+                catch (SocketException)
+                {
+                    consoleLogger.LogMessage($"Unable to start {ListenerType} listener.", ConsoleColor.Red);
                 }
             });
         }
 
-        protected abstract int RequiredPortMapping(IConfigModel configModel);
+        protected void Initialize()
+        {
+            TcpListener = new TcpListener(ListenerIpAddress, ListenerPort);
+            TcpListener.AllowNatTraversal(true);
+        }
 
         protected abstract void AcceptTcpClient(TcpClient tcpClient);
 

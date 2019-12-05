@@ -2,13 +2,14 @@
 // 
 // Please see the included LICENSE file for more information.
 
+using System.IO;
 using System.Threading;
-using TheDialgaTeam.Core.DependencyInjection.Service;
+using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
 
 namespace Tuckfirtle.Node.Config
 {
-    internal sealed class ConfigService : IServiceExecutor
+    internal sealed class ConfigServiceExecutor : IServiceExecutor
     {
         private IConfig Config { get; }
 
@@ -16,18 +17,18 @@ namespace Tuckfirtle.Node.Config
 
         private CancellationTokenSource CancellationTokenSource { get; }
 
-        public ConfigService(IConfig config, IConsoleLogger consoleLogger, CancellationTokenSource cancellationTokenSource)
+        public ConfigServiceExecutor(IConfig config, IConsoleLogger consoleLogger, CancellationTokenSource cancellationTokenSource)
         {
             Config = config;
             ConsoleLogger = consoleLogger;
             CancellationTokenSource = cancellationTokenSource;
         }
 
-        public void Execute()
+        public void ExecuteService(ITaskAwaiter taskAwaiter)
         {
             var config = Config;
 
-            if (!config.IsConfigFileExist)
+            if (!File.Exists(config.ConfigFilePath))
             {
                 config.SaveConfig();
 

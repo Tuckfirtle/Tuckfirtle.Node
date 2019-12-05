@@ -4,7 +4,6 @@
 
 using System.IO;
 using Newtonsoft.Json;
-using Tuckfirtle.Node.Config.Model;
 
 namespace Tuckfirtle.Node.Config.Json
 {
@@ -16,20 +15,16 @@ namespace Tuckfirtle.Node.Config.Json
 
         public override void LoadConfig()
         {
-            using (var streamReader = new StreamReader(new FileStream(ConfigFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
-            {
-                var jsonSerializer = new JsonSerializer();
-                ConfigModel = jsonSerializer.Deserialize<ConfigModel>(new JsonTextReader(streamReader));
-            }
+            using var streamReader = new StreamReader(new FileStream(ConfigFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            var jsonSerializer = new JsonSerializer();
+            jsonSerializer.Populate(new JsonTextReader(streamReader), this);
         }
 
         public override void SaveConfig()
         {
-            using (var streamWriter = new StreamWriter(new FileStream(ConfigFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
-            {
-                var jsonSerializer = new JsonSerializer { Formatting = Formatting.Indented };
-                jsonSerializer.Serialize(streamWriter, ConfigModel);
-            }
+            using var streamWriter = new StreamWriter(new FileStream(ConfigFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
+            var jsonSerializer = new JsonSerializer { Formatting = Formatting.Indented };
+            jsonSerializer.Serialize(streamWriter, this);
         }
     }
 }

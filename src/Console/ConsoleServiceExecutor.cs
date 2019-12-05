@@ -6,39 +6,34 @@ using System;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading;
-using TheDialgaTeam.Core.DependencyInjection.Service;
-using TheDialgaTeam.Core.DependencyInjection.TaskAwaiter;
+using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
 using Tuckfirtle.Core;
-using Tuckfirtle.Core.Blockchain;
-using Tuckfirtle.Node.Config.Model;
+using Tuckfirtle.Node.Config;
 
 namespace Tuckfirtle.Node.Console
 {
-    internal sealed class ConsoleService : IServiceExecutor
+    internal sealed class ConsoleServiceExecutor : IServiceExecutor
     {
         private IConsoleLogger ConsoleLogger { get; }
 
-        private IConfigModel ConfigModel { get; }
-
-        private ITaskAwaiter TaskAwaiter { get; }
+        private IConfig Config { get; }
 
         private CancellationTokenSource CancellationTokenSource { get; }
 
-        public ConsoleService(IConsoleLogger consoleLogger, IConfigModel configModel, ITaskAwaiter taskAwaiter, CancellationTokenSource cancellationTokenSource)
+        public ConsoleServiceExecutor(IConsoleLogger consoleLogger, IConfig config, CancellationTokenSource cancellationTokenSource)
         {
             ConsoleLogger = consoleLogger;
-            ConfigModel = configModel;
-            TaskAwaiter = taskAwaiter;
+            Config = config;
             CancellationTokenSource = cancellationTokenSource;
         }
 
-        public void Execute()
+        public void ExecuteService(ITaskAwaiter taskAwaiter)
         {
-            TaskAwaiter.EnqueueTask((ConsoleLogger, ConfigModel, CancellationTokenSource), async (token, state) =>
+            taskAwaiter.EnqueueTask((ConsoleLogger, Config, CancellationTokenSource), async (token, state) =>
             {
                 var consoleLogger = state.ConsoleLogger;
-                var configModel = state.ConfigModel;
+                var config = state.Config;
                 var cancellationTokenSource = state.CancellationTokenSource;
 
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
@@ -65,13 +60,7 @@ namespace Tuckfirtle.Node.Console
                     .WriteLine("", false)
                     .Build());
 
-                var test = new Account();
-                ConsoleLogger.LogMessage(test.AccountAddress);
-
-                System.Console.CancelKeyPress += (sender, args) =>
-                {
-                    args.Cancel = true;
-                };
+                System.Console.CancelKeyPress += (sender, args) => { args.Cancel = true; };
 
                 while (!token.IsCancellationRequested)
                 {
@@ -82,7 +71,7 @@ namespace Tuckfirtle.Node.Console
                         cancellationTokenSource.Cancel();
                         continue;
                     }
-                    
+
                     if (command.Trim().Equals("help", StringComparison.OrdinalIgnoreCase))
                     {
                         consoleLogger.LogMessage(new ConsoleMessageBuilder()

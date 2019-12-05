@@ -6,9 +6,19 @@ namespace Tuckfirtle.Node.Config
 {
     internal interface IConfig
     {
-        string ConfigFilePath { get; }
+        NetworkType NetworkType { get; }
 
-        bool IsConfigFileExist { get; }
+        bool UniversalPlugAndPlay { get; }
+
+        string P2PListenerIp { get; }
+
+        int P2PListenerPort { get; }
+
+        string RPCListenerIp { get; }
+
+        int RPCListenerPort { get; }
+
+        string ConfigFilePath { get; }
 
         void LoadConfig();
 

@@ -4,23 +4,22 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection;
-using TheDialgaTeam.Core.DependencyInjection.Factory;
 
 namespace Tuckfirtle.Node.Config.Json
 {
-    internal sealed class JsonConfigFactoryInstaller : IFactoryInstaller
+    internal sealed class JsonConfigServiceInstaller : IServiceInstaller
     {
         private string ConfigFilePath { get; }
 
-        public JsonConfigFactoryInstaller(string configFilePath)
+        public JsonConfigServiceInstaller(string configFilePath)
         {
             ConfigFilePath = configFilePath;
         }
 
-        public void Install(IServiceCollection serviceCollection)
+        public void InstallService(IServiceCollection serviceCollection)
         {
             serviceCollection.AddInterfacesAsSingleton(new JsonConfig(ConfigFilePath));
-            serviceCollection.AddInterfacesAsSingleton<ConfigService>();
+            serviceCollection.AddInterfacesAsSingleton<ConfigServiceExecutor>();
         }
     }
 }

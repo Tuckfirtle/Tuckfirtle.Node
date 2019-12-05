@@ -4,15 +4,14 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection;
-using TheDialgaTeam.Core.DependencyInjection.Factory;
 
 namespace Tuckfirtle.Node.Bootstrap
 {
-    internal sealed class BootstrapFactoryInstaller : IFactoryInstaller
+    internal sealed class BootstrapServiceInstaller : IServiceInstaller
     {
-        public void Install(IServiceCollection serviceCollection)
+        public void InstallService(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddInterfacesAsSingleton<BootstrapService>();
+            serviceCollection.AddInterfacesAsSingleton<BootstrapServiceExecutor>();
         }
     }
 }

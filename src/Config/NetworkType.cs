@@ -2,11 +2,11 @@
 // 
 // Please see the included LICENSE file for more information.
 
-namespace Tuckfirtle.Node.Config.Model
+namespace Tuckfirtle.Node.Config
 {
     internal enum NetworkType
     {
-        Testnet,
-        Mainnet
+        Testnet = 0,
+        Mainnet = 1
     }
 }

@@ -2,19 +2,28 @@
 // 
 // Please see the included LICENSE file for more information.
 
-using System;
+using System.Net;
 using System.Net.Sockets;
-using Tuckfirtle.Node.Config.Model;
+using TheDialgaTeam.Core.DependencyInjection;
+using TheDialgaTeam.Core.Logger;
+using Tuckfirtle.Node.Config;
 
 namespace Tuckfirtle.Node.Network.Listener
 {
     internal sealed class RPCListener : BaseListener
     {
-        protected override string ListenerType { get; } = "RPC";
+        public override string ListenerType { get; } = "RPC";
 
-        protected override int RequiredPortMapping(IConfigModel configModel)
+        public override IPAddress ListenerIpAddress { get; }
+
+        public override int ListenerPort { get; }
+
+        public RPCListener(IConfig config, IConsoleLogger consoleLogger, ITaskAwaiter taskAwaiter) : base(config, consoleLogger, taskAwaiter)
         {
-            return configModel.RPCListenerPort;
+            ListenerIpAddress = IPAddress.Parse(config.RPCListenerIp);
+            ListenerPort = config.RPCListenerPort;
+
+            Initialize();
         }
 
         protected override void AcceptTcpClient(TcpClient tcpClient)
