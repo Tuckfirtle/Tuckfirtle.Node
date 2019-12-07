@@ -22,7 +22,6 @@ namespace Tuckfirtle.Node.Network.Listener
         {
             ListenerIpAddress = IPAddress.Parse(config.RPCListenerIp);
             ListenerPort = config.RPCListenerPort;
-
             Initialize();
         }
 

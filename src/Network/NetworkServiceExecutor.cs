@@ -16,7 +16,7 @@ using Tuckfirtle.Node.Network.Listener;
 
 namespace Tuckfirtle.Node.Network
 {
-    internal sealed class NetworkServiceExecutor : IServiceExecutor
+    internal sealed class NetworkServiceExecutor : IServiceExecutor, IDisposable
     {
         private IEnumerable<IListener> Listeners { get; }
 
@@ -38,21 +38,16 @@ namespace Tuckfirtle.Node.Network
         {
             taskAwaiter.EnqueueTask((Listeners, Config, ConsoleLogger, NatDiscoverer), async (cancellationToken, state) =>
             {
-                var listeners = state.Listeners.ToArray();
-                var config = state.Config;
-                var consoleLogger = state.ConsoleLogger;
-                var natDiscoverer = state.NatDiscoverer;
-
-                // This is a fail safe mechanism in case someone clicked the BIG RED X BUTTON. It should release the port in time.
-                AppDomain.CurrentDomain.ProcessExit += (sender, args) => NatDiscoverer.ReleaseAll();
+                var (listeners, config, consoleLogger, natDiscoverer) = state;
+                listeners = listeners.ToArray();
 
                 if (config.UniversalPlugAndPlay)
                 {
                     try
                     {
-                        consoleLogger.LogMessage("Locating NAT devices. This may take 5 seconds...");
+                        consoleLogger.LogMessage("Locating NAT devices. This may take 3 seconds...");
 
-                        var natDevices = await natDiscoverer.DiscoverDevicesAsync(PortMapper.Pmp | PortMapper.Upnp, new CancellationTokenSource(5000)).ConfigureAwait(false);
+                        var natDevices = await natDiscoverer.DiscoverDevicesAsync(PortMapper.Pmp | PortMapper.Upnp, new CancellationTokenSource(3000)).ConfigureAwait(false);
                         var natDevicesAvailable = false;
 
                         foreach (var natDevice in natDevices)
@@ -89,6 +84,11 @@ namespace Tuckfirtle.Node.Network
                 foreach (var listener in listeners)
                     listener.StartListener();
             });
+        }
+
+        public void Dispose()
+        {
+            NatDiscoverer.ReleaseAll();
         }
     }
 }

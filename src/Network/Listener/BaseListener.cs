@@ -3,7 +3,6 @@
 // Please see the included LICENSE file for more information.
 
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -31,8 +30,6 @@ namespace Tuckfirtle.Node.Network.Listener
 
         private TcpListener TcpListener { get; set; }
 
-        private List<TcpClient> TcpClients { get; } = new List<TcpClient>();
-
         protected BaseListener(IConfig config, IConsoleLogger consoleLogger, ITaskAwaiter taskAwaiter)
         {
             Config = config;
@@ -44,8 +41,7 @@ namespace Tuckfirtle.Node.Network.Listener
         {
             TaskAwaiter.EnqueueTask((TcpListener, ConsoleLogger), async (cancellationToken, state) =>
             {
-                var listener = state.TcpListener;
-                var consoleLogger = state.ConsoleLogger;
+                var (listener, consoleLogger) = state;
 
                 try
                 {
@@ -54,16 +50,14 @@ namespace Tuckfirtle.Node.Network.Listener
 
                     while (!cancellationToken.IsCancellationRequested)
                     {
-                        if (listener.Pending())
-                        {
-                            var tcpClient = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
-
-                            TcpClients.Add(tcpClient);
-                            AcceptTcpClient(tcpClient);
-                        }
-
                         try
                         {
+                            if (listener.Pending())
+                            {
+                                var tcpClient = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
+                                AcceptTcpClient(tcpClient);
+                            }
+
                             await Task.Delay(1, cancellationToken).ConfigureAwait(false);
                         }
                         catch (TaskCanceledException)
@@ -86,31 +80,9 @@ namespace Tuckfirtle.Node.Network.Listener
 
         protected abstract void AcceptTcpClient(TcpClient tcpClient);
 
-        private async Task<IPAddress> GetPublicIpAddressAsync()
-        {
-            try
-            {
-                using var httpClient = new HttpClient();
-                
-                var request = await httpClient.GetAsync("https://api.ipify.org", new CancellationTokenSource(10000).Token).ConfigureAwait(false);
-                request.EnsureSuccessStatusCode();
-
-                var response = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-                return IPAddress.TryParse(response, out var result) ? result : IPAddress.None;
-            }
-            catch (Exception)
-            {
-                return IPAddress.None;
-            }
-        }
-
         public void Dispose()
         {
             TcpListener?.Stop();
-
-            foreach (var tcpClient in TcpClients)
-                tcpClient.Dispose();
         }
     }
 }

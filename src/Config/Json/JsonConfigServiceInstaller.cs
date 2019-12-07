@@ -19,7 +19,6 @@ namespace Tuckfirtle.Node.Config.Json
         public void InstallService(IServiceCollection serviceCollection)
         {
             serviceCollection.AddInterfacesAsSingleton(new JsonConfig(ConfigFilePath));
-            serviceCollection.AddInterfacesAsSingleton<ConfigServiceExecutor>();
         }
     }
 }

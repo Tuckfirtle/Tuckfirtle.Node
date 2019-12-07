@@ -5,16 +5,13 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
-using TheDialgaTeam.Core.Logger;
+using TheDialgaTeam.Core.Task;
 
 namespace Tuckfirtle.Node.Network.Client
 {
     internal abstract class BaseClient : IDisposable
     {
-        private IConsoleLogger ConsoleLogger { get; }
-
         private TcpClient TcpClient { get; }
 
         private StreamReader TcpClientReader { get; }
@@ -23,44 +20,44 @@ namespace Tuckfirtle.Node.Network.Client
 
         private Task ReadPacketFromNetworkTask { get; }
 
-        protected BaseClient(TcpClient tcpClient, IConsoleLogger consoleLogger)
+        protected BaseClient(TcpClient tcpClient)
         {
-            ConsoleLogger = consoleLogger;
             TcpClient = tcpClient;
             TcpClientReader = new StreamReader(tcpClient.GetStream());
             TcpClientWriter = new StreamWriter(tcpClient.GetStream());
 
-            ReadPacketFromNetworkTask = Task.Factory.StartNew(async state =>
+            ReadPacketFromNetworkTask = Task.Factory.StartNew<Task, (StreamReader, Action<string>)>(async state =>
             {
-                if (TcpClientReader.BaseStream is NetworkStream networkStream)
+                var (tcpClientReader, onHandlePacketFromNetwork) = state;
+
+                if (tcpClientReader?.BaseStream is NetworkStream networkStream)
                 {
-                    while (true)
+                    try
                     {
-                        try
+                        while (true)
                         {
                             if (networkStream.DataAvailable)
-                            {
-                                //var packet = await OnReceivePacketFromNetworkAsync(TcpClientReader).ConfigureAwait(false);
-                                //_ = Task.Run(async () => await OnHandlePacketFromNetworkAsync(packet).ConfigureAwait(false));
-                            }
+                                onHandlePacketFromNetwork(tcpClientReader.ReadLine());
 
                             await Task.Delay(1).ConfigureAwait(false);
                         }
-                        catch (Exception)
-                        {
-                        }
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
                     }
                 }
-            }, consoleLogger).Unwrap();
+            }, (TcpClientReader, OnHandlePacketFromNetwork)).Unwrap();
         }
 
-        protected abstract Task OnHandlePacketFromNetworkAsync(string packet);
+        protected abstract void OnHandlePacketFromNetwork(string packet);
 
         public void Dispose()
         {
             TcpClient?.Dispose();
             TcpClientReader?.Dispose();
             TcpClientWriter?.Dispose();
+            ReadPacketFromNetworkTask?.Dispose();
         }
     }
 }
