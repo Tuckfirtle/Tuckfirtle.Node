@@ -2,11 +2,13 @@
 // 
 // Please see the included LICENSE file for more information.
 
+using System;
 using System.Net;
 using System.Net.Sockets;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
 using Tuckfirtle.Node.Config;
+using Tuckfirtle.Node.Network.Client;
 
 namespace Tuckfirtle.Node.Network.Listener
 {
@@ -18,17 +20,29 @@ namespace Tuckfirtle.Node.Network.Listener
 
         public override int ListenerPort { get; }
 
-        public P2PListener(IConfig config, IConsoleLogger consoleLogger, ITaskAwaiter taskAwaiter) : base(config, consoleLogger, taskAwaiter)
+        private P2PClientCollection P2PClientCollection { get; }
+
+        public P2PListener(IConsoleLogger consoleLogger, ITaskAwaiter taskAwaiter, IConfig config, P2PClientCollection p2pClientCollection) : base(consoleLogger, taskAwaiter)
         {
+            P2PClientCollection = p2pClientCollection;
             ListenerIpAddress = IPAddress.Parse(config.P2PListenerIp);
             ListenerPort = config.P2PListenerPort;
+
             Initialize();
         }
 
         protected override void AcceptTcpClient(TcpClient tcpClient)
         {
-            // TODO: Whatever you need to handle P2P connections.
-            tcpClient.Dispose();
+            var peer = new P2PClient(tcpClient);
+            ConsoleLogger.LogMessage($"[{ListenerType} IN {peer.PublicIpAddress}] Incoming connection.", ConsoleColor.Cyan);
+
+            if (!P2PClientCollection.TryAddPeer(peer))
+            {
+                peer.Dispose();
+                ConsoleLogger.LogMessage($"[{ListenerType} IN {peer.PublicIpAddress}] Connection dropped.", ConsoleColor.Cyan);
+            }
+            else
+                ConsoleLogger.LogMessage($"[{ListenerType} IN {peer.PublicIpAddress}] Connected.", ConsoleColor.Cyan);
         }
     }
 }

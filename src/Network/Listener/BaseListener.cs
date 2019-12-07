@@ -4,12 +4,11 @@
 
 using System;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
+using TheDialgaTeam.Core.Task;
 using Tuckfirtle.Node.Config;
 
 namespace Tuckfirtle.Node.Network.Listener
@@ -22,17 +21,14 @@ namespace Tuckfirtle.Node.Network.Listener
 
         public abstract int ListenerPort { get; }
 
-        private IConfig Config { get; }
-
-        private IConsoleLogger ConsoleLogger { get; }
+        protected IConsoleLogger ConsoleLogger { get; }
 
         private ITaskAwaiter TaskAwaiter { get; }
 
         private TcpListener TcpListener { get; set; }
 
-        protected BaseListener(IConfig config, IConsoleLogger consoleLogger, ITaskAwaiter taskAwaiter)
+        protected BaseListener(IConsoleLogger consoleLogger, ITaskAwaiter taskAwaiter)
         {
-            Config = config;
             ConsoleLogger = consoleLogger;
             TaskAwaiter = taskAwaiter;
         }
@@ -55,7 +51,7 @@ namespace Tuckfirtle.Node.Network.Listener
                             if (listener.Pending())
                             {
                                 var tcpClient = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
-                                AcceptTcpClient(tcpClient);
+                                _ = Task.Factory.StartNew<(TcpClient tcpClient, Action<TcpClient> acceptTcpClient)>(innerState => { innerState.acceptTcpClient(innerState.tcpClient); }, (tcpClient, AcceptTcpClient), cancellationToken);
                             }
 
                             await Task.Delay(1, cancellationToken).ConfigureAwait(false);

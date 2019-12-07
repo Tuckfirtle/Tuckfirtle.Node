@@ -3,7 +3,9 @@
 // Please see the included LICENSE file for more information.
 
 using System;
+using System.Collections.Generic;
 using System.Net;
+using Newtonsoft.Json;
 using Tuckfirtle.Core;
 
 namespace Tuckfirtle.Node.Config
@@ -18,10 +20,17 @@ namespace Tuckfirtle.Node.Config
 
         public int P2PListenerPort { get; set; } = CoreConfiguration.P2PDefaultPort;
 
+        public int P2PMaxConnectionLimit { get; set; } = int.MaxValue;
+
+        public int P2PPingLimit { get; set; } = 1000;
+
+        public List<string> P2PIpBlacklist { get; set; } = new List<string>();
+
         public string RPCListenerIp { get; set; } = IPAddress.Any.ToString();
 
         public int RPCListenerPort { get; set; } = CoreConfiguration.RPCDefaultPort;
 
+        [JsonIgnore]
         public string ConfigFilePath { get; }
 
         protected Config(string configFilePath)

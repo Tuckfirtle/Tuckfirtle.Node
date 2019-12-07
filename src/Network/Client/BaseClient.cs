@@ -4,7 +4,9 @@
 
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using TheDialgaTeam.Core.Task;
 
@@ -12,6 +14,8 @@ namespace Tuckfirtle.Node.Network.Client
 {
     internal abstract class BaseClient : IDisposable
     {
+        public IPEndPoint PublicIpAddress => TcpClient?.Client.RemoteEndPoint as IPEndPoint;
+
         private TcpClient TcpClient { get; }
 
         private StreamReader TcpClientReader { get; }
@@ -20,7 +24,14 @@ namespace Tuckfirtle.Node.Network.Client
 
         private Task ReadPacketFromNetworkTask { get; }
 
-        protected BaseClient(TcpClient tcpClient)
+        private SemaphoreSlim SemaphoreSlim { get; }
+
+        protected BaseClient()
+        {
+            SemaphoreSlim = new SemaphoreSlim(1, 1);
+        }
+
+        protected BaseClient(TcpClient tcpClient) : this()
         {
             TcpClient = tcpClient;
             TcpClientReader = new StreamReader(tcpClient.GetStream());
@@ -48,6 +59,10 @@ namespace Tuckfirtle.Node.Network.Client
                     }
                 }
             }, (TcpClientReader, OnHandlePacketFromNetwork)).Unwrap();
+        }
+
+        public virtual void SendPacketToNetworkAsync(string packet)
+        {
         }
 
         protected abstract void OnHandlePacketFromNetwork(string packet);

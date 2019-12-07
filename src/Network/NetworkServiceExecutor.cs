@@ -5,6 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Open.Nat;
@@ -83,6 +85,11 @@ namespace Tuckfirtle.Node.Network
 
                 foreach (var listener in listeners)
                     listener.StartListener();
+
+                // TESTING CODE
+                var test = new TcpClient();
+                test.Connect(IPAddress.Parse("116.89.53.178"), Config.P2PListenerPort);
+                test.Dispose();
             });
         }
 

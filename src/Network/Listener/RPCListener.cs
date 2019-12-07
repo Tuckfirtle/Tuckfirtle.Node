@@ -18,7 +18,7 @@ namespace Tuckfirtle.Node.Network.Listener
 
         public override int ListenerPort { get; }
 
-        public RPCListener(IConfig config, IConsoleLogger consoleLogger, ITaskAwaiter taskAwaiter) : base(config, consoleLogger, taskAwaiter)
+        public RPCListener(IConsoleLogger consoleLogger, ITaskAwaiter taskAwaiter, IConfig config) : base(consoleLogger, taskAwaiter)
         {
             ListenerIpAddress = IPAddress.Parse(config.RPCListenerIp);
             ListenerPort = config.RPCListenerPort;

@@ -52,7 +52,6 @@ namespace Tuckfirtle.Node
                     if (message.Count > 1)
                     {
                         consoleLogger.LogMessage(message);
-                        provider.GetRequiredService<CancellationTokenSource>().Cancel();
                         System.Console.ReadLine();
                     }
 
@@ -65,7 +64,6 @@ namespace Tuckfirtle.Node
                         .WriteLine("Press Enter/Return to exit...")
                         .Build());
 
-                    provider.GetRequiredService<CancellationTokenSource>().Cancel();
                     System.Console.ReadLine();
 
                     ExitWithFault();

@@ -72,8 +72,8 @@ namespace Tuckfirtle.Node.Console
                     .WriteLine("Press Enter/Return to exit...", false)
                     .Build());
 
-                CancellationTokenSource.Cancel();
                 System.Console.ReadLine();
+                CancellationTokenSource.Cancel();
             }
             else
             {
