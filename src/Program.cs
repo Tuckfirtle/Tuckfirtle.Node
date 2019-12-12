@@ -4,8 +4,6 @@
 
 using System;
 using System.IO;
-using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
 using TheDialgaTeam.Core.Logger.DependencyInjection.Installer;

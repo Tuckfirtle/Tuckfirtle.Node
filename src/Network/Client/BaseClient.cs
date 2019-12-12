@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using TheDialgaTeam.Core.Task;
+using TheDialgaTeam.Core.Tasks;
 
 namespace Tuckfirtle.Node.Network.Client
 {

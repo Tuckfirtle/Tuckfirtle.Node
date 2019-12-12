@@ -8,8 +8,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
-using TheDialgaTeam.Core.Task;
-using Tuckfirtle.Node.Config;
+using TheDialgaTeam.Core.Tasks;
 
 namespace Tuckfirtle.Node.Network.Listener
 {

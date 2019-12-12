@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
-using TheDialgaTeam.Core.Task;
+using TheDialgaTeam.Core.Tasks;
 using Tuckfirtle.Core;
 using Tuckfirtle.Node.Config;
 
@@ -74,11 +74,10 @@ namespace Tuckfirtle.Node.Console
 
                 System.Console.ReadLine();
                 CancellationTokenSource.Cancel();
+                return;
             }
-            else
-            {
-                Config.LoadConfig();
-            }
+
+            Config.LoadConfig();
 
             Task.Factory.StartNew(async innerState =>
             {
