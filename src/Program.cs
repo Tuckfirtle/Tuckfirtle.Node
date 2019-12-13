@@ -15,7 +15,7 @@ namespace Tuckfirtle.Node
 {
     internal static class Program
     {
-        private static DependencyManager DependencyManager { get; } = new DependencyManager();
+        private static readonly DependencyManager DependencyManager = new DependencyManager();
 
         public static void Main()
         {

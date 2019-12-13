@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
 using TheDialgaTeam.Core.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace Tuckfirtle.Node.Network.Listener
 {

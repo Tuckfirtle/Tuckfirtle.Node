@@ -16,9 +16,9 @@ namespace Tuckfirtle.Node.Network
         {
             serviceCollection.AddInterfacesAndSelfAsSingleton<NatDiscoverer>();
             serviceCollection.AddSingleton<P2PClientCollection>();
-            serviceCollection.AddInterfacesAsSingleton<P2PListener>();
-            serviceCollection.AddInterfacesAsSingleton<RPCListener>();
-            serviceCollection.AddInterfacesAsSingleton<NetworkServiceExecutor>();
+            serviceCollection.AddInterfacesAndSelfAsSingleton<P2PListener>();
+            serviceCollection.AddInterfacesAndSelfAsSingleton<RPCListener>();
+            serviceCollection.AddInterfacesAndSelfAsSingleton<NetworkServiceExecutor>();
         }
     }
 }

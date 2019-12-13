@@ -37,7 +37,7 @@ namespace Tuckfirtle.Node.Network.Client
             TcpClientReader = new StreamReader(tcpClient.GetStream());
             TcpClientWriter = new StreamWriter(tcpClient.GetStream());
 
-            ReadPacketFromNetworkTask = Task.Factory.StartNew<Task, (StreamReader, Action<string>)>(async state =>
+            ReadPacketFromNetworkTask = Task.Factory.StartNew<(StreamReader, Action<string>), Task>(async state =>
             {
                 var (tcpClientReader, onHandlePacketFromNetwork) = state;
 

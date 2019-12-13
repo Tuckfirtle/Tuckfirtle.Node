@@ -43,7 +43,7 @@
     <ProjectReference Include="..\..\TheDialgaTeam.Core.DependencyInjection\src\TheDialgaTeam.Core.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\TheDialgaTeam.Core.Logger.DependencyInjection\src\TheDialgaTeam.Core.Logger.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\TheDialgaTeam.Core.Logger\src\TheDialgaTeam.Core.Logger.csproj" />
-    <ProjectReference Include="..\..\TheDialgaTeam.Core.Task\src\TheDialgaTeam.Core.Tasks.csproj" />
+    <ProjectReference Include="..\..\TheDialgaTeam.Core.Tasks\src\TheDialgaTeam.Core.Tasks.csproj" />
     <ProjectReference Include="..\..\Tuckfirtle.Core\src\Tuckfirtle.Core.csproj" />
     <ProjectReference Include="..\..\Tuckfirtle.OpenQuantumSafe\src\Tuckfirtle.OpenQuantumSafe.csproj" />
   </ItemGroup>

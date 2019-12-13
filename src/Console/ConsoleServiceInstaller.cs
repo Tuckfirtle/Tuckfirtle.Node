@@ -11,7 +11,7 @@ namespace Tuckfirtle.Node.Console
     {
         public void InstallService(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddInterfacesAsSingleton<ConsoleServiceExecutor>();
+            serviceCollection.AddInterfacesAndSelfAsSingleton<ConsoleServiceExecutor>();
         }
     }
 }

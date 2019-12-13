@@ -13,6 +13,7 @@ using TheDialgaTeam.Core.Logger;
 using TheDialgaTeam.Core.Tasks;
 using Tuckfirtle.Core;
 using Tuckfirtle.Node.Config;
+using Task = System.Threading.Tasks.Task;
 
 namespace Tuckfirtle.Node.Console
 {
