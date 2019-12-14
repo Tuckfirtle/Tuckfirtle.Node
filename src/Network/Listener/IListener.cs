@@ -1,19 +1,19 @@
-﻿// Copyright (C) 2019, The Tuckfirtle Developers
-// 
-// Please see the included LICENSE file for more information.
+﻿//// Copyright (C) 2019, The Tuckfirtle Developers
+//// 
+//// Please see the included LICENSE file for more information.
 
-using System.Net;
+//using System.Net;
 
-namespace Tuckfirtle.Node.Network.Listener
-{
-    internal interface IListener
-    {
-        string ListenerType { get; }
+//namespace Tuckfirtle.Node.Network.Listener
+//{
+//    internal interface IListener
+//    {
+//        string ListenerType { get; }
 
-        IPAddress ListenerIpAddress { get; }
+//        IPAddress ListenerIpAddress { get; }
 
-        int ListenerPort { get; }
+//        int ListenerPort { get; }
 
-        void StartListener();
-    }
-}
+//        void StartListener();
+//    }
+//}

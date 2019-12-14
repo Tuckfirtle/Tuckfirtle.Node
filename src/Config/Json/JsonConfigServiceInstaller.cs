@@ -7,18 +7,18 @@ using TheDialgaTeam.Core.DependencyInjection;
 
 namespace Tuckfirtle.Node.Config.Json
 {
-    internal sealed class JsonConfigServiceInstaller : IServiceInstaller
+    internal class JsonConfigServiceInstaller : IServiceInstaller
     {
-        private string ConfigFilePath { get; }
+        private readonly string _configFilePath;
 
         public JsonConfigServiceInstaller(string configFilePath)
         {
-            ConfigFilePath = configFilePath;
+            _configFilePath = configFilePath;
         }
 
         public void InstallService(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddInterfacesAndSelfAsSingleton(new JsonConfig(ConfigFilePath));
+            serviceCollection.AddInterfacesAndSelfAsSingleton(new JsonConfig(_configFilePath));
         }
     }
 }

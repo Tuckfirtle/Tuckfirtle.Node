@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Tuckfirtle.Node.Config.Json
 {
-    internal sealed class JsonConfig : Config
+    internal class JsonConfig : Config
     {
         public JsonConfig(string configFilePath) : base(configFilePath)
         {

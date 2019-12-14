@@ -7,29 +7,27 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading;
-using System.Threading.Tasks;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
 using TheDialgaTeam.Core.Tasks;
 using Tuckfirtle.Core;
 using Tuckfirtle.Node.Config;
-using Task = System.Threading.Tasks.Task;
 
 namespace Tuckfirtle.Node.Console
 {
-    internal sealed class ConsoleServiceExecutor : IServiceExecutor
+    internal class ConsoleServiceExecutor : IServiceExecutor
     {
-        private IConsoleLogger ConsoleLogger { get; }
+        private readonly IConfig _config;
 
-        private CancellationTokenSource CancellationTokenSource { get; }
+        private readonly IConsoleLogger _consoleLogger;
 
-        private IConfig Config { get; }
+        private readonly CancellationTokenSource _cancellationTokenSource;
 
-        public ConsoleServiceExecutor(IConsoleLogger consoleLogger, CancellationTokenSource cancellationTokenSource, IConfig config)
+        public ConsoleServiceExecutor(IConfig config, IConsoleLogger consoleLogger, CancellationTokenSource cancellationTokenSource)
         {
-            ConsoleLogger = consoleLogger;
-            CancellationTokenSource = cancellationTokenSource;
-            Config = config;
+            _config = config;
+            _consoleLogger = consoleLogger;
+            _cancellationTokenSource = cancellationTokenSource;
         }
 
         public void ExecuteService(ITaskAwaiter taskAwaiter)
@@ -40,7 +38,7 @@ namespace Tuckfirtle.Node.Console
             System.Console.Title = $"{CoreConfiguration.CoinFullName} Node v{version} ({frameworkVersion})";
             System.Console.CancelKeyPress += (sender, args) => { args.Cancel = true; };
 
-            ConsoleLogger.LogMessage(new ConsoleMessageBuilder()
+            _consoleLogger.LogMessage(new ConsoleMessageBuilder()
                 .WriteLine("", false)
                 .WriteLine("████████╗██╗   ██╗ ██████╗██╗  ██╗███████╗██╗██████╗ ████████╗██╗     ███████╗", false)
                 .WriteLine("╚══██╔══╝██║   ██║██╔════╝██║ ██╔╝██╔════╝██║██╔══██╗╚══██╔══╝██║     ██╔════╝", false)
@@ -61,28 +59,28 @@ namespace Tuckfirtle.Node.Console
                 .WriteLine("", false)
                 .Build());
 
-            if (!File.Exists(Config.ConfigFilePath))
+            if (!File.Exists(_config.ConfigFilePath))
             {
-                Config.SaveConfig();
+                _config.SaveConfig();
 
-                ConsoleLogger.LogMessage(new ConsoleMessageBuilder()
+                _consoleLogger.LogMessage(new ConsoleMessageBuilder()
                     .WriteLine("Thank you for running a public node! This will help the chain a lot.", false)
                     .WriteLine("We are now building a configuration file for this node...", false)
-                    .WriteLine($"Generated configuration file is at: \"{Config.ConfigFilePath}\"", false)
+                    .WriteLine($"Generated configuration file is at: \"{_config.ConfigFilePath}\"", false)
                     .WriteLine("Please ensure that the configuration is correct and run this application again to start the node.", false)
                     .WriteLine("Press Enter/Return to exit...", false)
                     .Build());
 
                 System.Console.ReadLine();
-                CancellationTokenSource.Cancel();
+                _cancellationTokenSource.Cancel();
                 return;
             }
 
-            Config.LoadConfig();
+            _config.LoadConfig();
 
-            Task.Factory.StartNew(async innerState =>
+            TaskState.RunAndForget((_consoleLogger, _cancellationTokenSource), async state =>
             {
-                var (consoleLogger, cancellationTokenSource) = innerState;
+                var (consoleLogger, cancellationTokenSource) = state;
 
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
@@ -94,19 +92,21 @@ namespace Tuckfirtle.Node.Console
                         continue;
                     }
 
-                    if (command.Trim().Equals("help", StringComparison.OrdinalIgnoreCase))
+                    command = command.Trim();
+
+                    if (command.Equals("help", StringComparison.OrdinalIgnoreCase))
                     {
                         consoleLogger.LogMessage(new ConsoleMessageBuilder()
                             .WriteLine("Available commands:", false)
                             .WriteLine("Exit - Signal the node to close. This will properly save the blockchain buffer if there is any.", false)
                             .Build());
                     }
-                    else if (command.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
+                    else if (command.Equals("exit", StringComparison.OrdinalIgnoreCase))
                         cancellationTokenSource.Cancel();
                     else
                         consoleLogger.LogMessage("Invalid command!", ConsoleColor.Red, false);
                 }
-            }, (ConsoleLogger, CancellationTokenSource), CancellationTokenSource.Token);
+            }, _cancellationTokenSource.Token);
         }
     }
 }

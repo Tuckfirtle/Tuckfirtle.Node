@@ -10,6 +10,7 @@ using TheDialgaTeam.Core.Logger.DependencyInjection.Installer;
 using Tuckfirtle.Node.Config.Json;
 using Tuckfirtle.Node.Console;
 using Tuckfirtle.Node.Network;
+using Tuckfirtle.OpenQuantumSafe;
 
 namespace Tuckfirtle.Node
 {
@@ -27,11 +28,12 @@ namespace Tuckfirtle.Node
             DependencyManager.InstallService(new ConsoleStreamWriteToFileQueueLoggerServiceInstaller(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.log")));
             DependencyManager.InstallService(new JsonConfigServiceInstaller(Path.Combine(Environment.CurrentDirectory, "Config.json")));
             DependencyManager.InstallService(new ConsoleServiceInstaller());
-            DependencyManager.InstallService(new NetworkServiceInstaller());
+            //DependencyManager.InstallService(new NetworkServiceInstaller());
 
             DependencyManager.BuildAndExecute((provider, exception) =>
             {
                 var consoleLogger = new ConsoleStreamLogger(System.Console.Error);
+                var fileLogger = new ConsoleStreamLogger(new StreamWriter(new FileStream(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.error"), FileMode.Append, FileAccess.Write, FileShare.Read)));
 
                 if (exception is AggregateException aggregateException)
                 {
@@ -50,22 +52,26 @@ namespace Tuckfirtle.Node
                     if (message.Count > 1)
                     {
                         consoleLogger.LogMessage(message);
+                        fileLogger.LogMessage(message);
                         System.Console.ReadLine();
                     }
-
-                    ExitWithFault();
                 }
                 else
                 {
-                    consoleLogger.LogMessage(new ConsoleMessageBuilder()
+                    var consoleMessage = new ConsoleMessageBuilder()
                         .WriteLine(exception.ToString(), ConsoleColor.Red)
                         .WriteLine("Press Enter/Return to exit...")
-                        .Build());
+                        .Build();
 
+                    consoleLogger.LogMessage(consoleMessage);
+                    fileLogger.LogMessage(consoleMessage);
                     System.Console.ReadLine();
-
-                    ExitWithFault();
                 }
+
+                consoleLogger.Dispose();
+                fileLogger.Dispose();
+
+                ExitWithFault();
             });
         }
 

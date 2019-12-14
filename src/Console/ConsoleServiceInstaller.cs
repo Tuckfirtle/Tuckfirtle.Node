@@ -7,7 +7,7 @@ using TheDialgaTeam.Core.DependencyInjection;
 
 namespace Tuckfirtle.Node.Console
 {
-    internal sealed class ConsoleServiceInstaller : IServiceInstaller
+    internal class ConsoleServiceInstaller : IServiceInstaller
     {
         public void InstallService(IServiceCollection serviceCollection)
         {
