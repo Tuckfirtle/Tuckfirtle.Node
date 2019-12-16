@@ -9,6 +9,7 @@ using TheDialgaTeam.Core.Logger;
 using TheDialgaTeam.Core.Logger.DependencyInjection.Installer;
 using Tuckfirtle.Node.Config.Json;
 using Tuckfirtle.Node.Console;
+using Tuckfirtle.Node.Network;
 
 namespace Tuckfirtle.Node
 {
@@ -26,7 +27,7 @@ namespace Tuckfirtle.Node
             DependencyManager.InstallService(new ConsoleStreamWriteToFileQueueLoggerServiceInstaller(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.log")));
             DependencyManager.InstallService(new JsonConfigServiceInstaller(Path.Combine(Environment.CurrentDirectory, "Config.json")));
             DependencyManager.InstallService(new ConsoleServiceInstaller());
-            //DependencyManager.InstallService(new NetworkServiceInstaller());
+            DependencyManager.InstallService(new NetworkServiceInstaller());
 
             DependencyManager.BuildAndExecute((provider, exception) =>
             {

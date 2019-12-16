@@ -3,6 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 using System.Collections.Generic;
+using Tuckfirtle.Core.Network;
 
 namespace Tuckfirtle.Node.Config
 {

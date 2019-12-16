@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json;
 using Tuckfirtle.Core;
+using Tuckfirtle.Core.Network;
 
 namespace Tuckfirtle.Node.Config
 {

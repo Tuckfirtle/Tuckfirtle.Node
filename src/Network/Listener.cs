@@ -10,7 +10,7 @@ using TheDialgaTeam.Core.Logger;
 
 namespace Tuckfirtle.Node.Network
 {
-    internal abstract class Listener
+    internal abstract class Listener : IListener
     {
         public event Action<List<ConsoleMessage>> Logger;
 

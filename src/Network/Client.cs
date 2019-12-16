@@ -17,36 +17,35 @@ namespace Tuckfirtle.Node.Network
     {
         public event Action<List<ConsoleMessage>> Logger;
 
-        private readonly TcpClient _tcpClient;
-
-        private NetworkStream _tcpNetworkStream;
-
         private Task _tcpClientReaderTask;
 
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         private bool _isDisposed;
 
-        public IPEndPoint RemoteIpEndPoint => _tcpClient?.Client?.RemoteEndPoint as IPEndPoint;
+        public IPEndPoint RemoteIpEndPoint => TcpClient?.Client?.RemoteEndPoint as IPEndPoint;
+
+        protected TcpClient TcpClient { get; }
+
+        protected NetworkStream NetworkStream { get; private set; }
+
+        protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
         protected Client(TcpClient tcpClient = null)
         {
-            _tcpClient = tcpClient ?? new TcpClient();
-
-            if (_tcpClient.Connected)
-                StartReadingPacketsFromNetwork();
+            TcpClient = tcpClient ?? new TcpClient();
         }
 
         public void Connect(string hostname, int port)
         {
             if (_isDisposed)
-                throw new ObjectDisposedException(nameof(_tcpClient));
+                throw new ObjectDisposedException(nameof(TcpClient));
 
-            if (_tcpClient.Connected)
+            if (TcpClient.Connected)
                 throw new InvalidOperationException("TcpClient is already connected.");
 
             BeforeConnect(hostname, port);
-            _tcpClient.Connect(hostname, port);
+            TcpClient.Connect(hostname, port);
             StartReadingPacketsFromNetwork();
             AfterConnect(hostname, port);
         }
@@ -54,13 +53,13 @@ namespace Tuckfirtle.Node.Network
         public async Task ConnectAsync(string hostname, int port)
         {
             if (_isDisposed)
-                throw new ObjectDisposedException(nameof(_tcpClient));
+                throw new ObjectDisposedException(nameof(TcpClient));
 
-            if (_tcpClient.Connected)
+            if (TcpClient.Connected)
                 throw new InvalidOperationException("TcpClient is already connected.");
 
             BeforeConnect(hostname, port);
-            await _tcpClient.ConnectAsync(hostname, port).ConfigureAwait(false);
+            await TcpClient.ConnectAsync(hostname, port).ConfigureAwait(false);
             StartReadingPacketsFromNetwork();
             AfterConnect(hostname, port);
         }
@@ -70,8 +69,8 @@ namespace Tuckfirtle.Node.Network
             BeforeClose();
             _cancellationTokenSource.Cancel();
             Task.WaitAll(_tcpClientReaderTask);
-            Dispose();
             AfterClose();
+            Dispose();
         }
 
         protected virtual void OnLogger(List<ConsoleMessage> consoleMessages)
@@ -99,15 +98,11 @@ namespace Tuckfirtle.Node.Network
             OnLogger(new ConsoleMessageBuilder().WriteLine($"Connection from {RemoteIpEndPoint} is closed.", ConsoleColor.Red).Build());
         }
 
-        protected virtual void SetNetworkStreamTimeout(NetworkStream networkStream)
+        protected virtual void BeforeStartReadingPacketsFromNetwork()
         {
         }
 
-        protected virtual void BeforeStartReadingPacketsFromNetwork(NetworkStream networkStream)
-        {
-        }
-
-        protected abstract Task<bool> ReadPacketsFromNetworkAsync(NetworkStream networkStream);
+        protected abstract Task<bool> ReadPacketsFromNetworkAsync(CancellationToken cancellationToken);
 
         protected virtual void Dispose(bool disposing)
         {
@@ -118,38 +113,35 @@ namespace Tuckfirtle.Node.Network
 
                 _isDisposed = true;
 
-                _tcpClient?.Dispose();
-                _tcpNetworkStream?.Dispose();
+                TcpClient?.Dispose();
+                NetworkStream?.Dispose();
                 _tcpClientReaderTask?.Dispose();
                 _cancellationTokenSource?.Dispose();
             }
         }
 
-        private void StartReadingPacketsFromNetwork()
+        protected void StartReadingPacketsFromNetwork()
         {
             if (_isDisposed)
-                throw new ObjectDisposedException(nameof(_tcpClient));
+                throw new ObjectDisposedException(nameof(TcpClient));
 
-            if (!_tcpClient.Connected)
+            if (!TcpClient.Connected)
                 throw new InvalidOperationException("TcpClient is not connected.");
 
             if (_tcpClientReaderTask != null)
                 return;
 
-            _tcpNetworkStream = _tcpClient.GetStream();
+            NetworkStream = TcpClient.GetStream();
 
-            if (_tcpNetworkStream.CanTimeout)
-                SetNetworkStreamTimeout(_tcpNetworkStream);
+            BeforeStartReadingPacketsFromNetwork();
 
-            BeforeStartReadingPacketsFromNetwork(_tcpNetworkStream);
-
-            _tcpClientReaderTask = TaskState.Run<(NetworkStream, CancellationTokenSource, Action, Func<NetworkStream, Task<bool>>), Task>((_tcpNetworkStream, _cancellationTokenSource, Dispose, ReadPacketsFromNetworkAsync), async state =>
+            _tcpClientReaderTask = TaskState.Run<(CancellationTokenSource, Action, Func<CancellationToken, Task<bool>>), Task>((_cancellationTokenSource, Dispose, ReadPacketsFromNetworkAsync), async state =>
             {
-                var (networkStream, cancellationTokenSource, dispose, readPacketsFromNetworkAsync) = state;
+                var (cancellationTokenSource, dispose, readPacketsFromNetworkAsync) = state;
 
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
-                    var packetResult = await readPacketsFromNetworkAsync(networkStream).ConfigureAwait(false);
+                    var packetResult = await readPacketsFromNetworkAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
                     if (packetResult)
                         continue;

@@ -4,9 +4,11 @@
 
 using System.Net;
 using TheDialgaTeam.Core.DependencyInjection;
+using TheDialgaTeam.Core.Tasks;
 using Tuckfirtle.Node.Config;
+using Tuckfirtle.Node.Network.Clients;
 
-namespace Tuckfirtle.Node.Network
+namespace Tuckfirtle.Node.Network.Listeners
 {
     internal class P2PListener : Listener
     {
@@ -14,12 +16,15 @@ namespace Tuckfirtle.Node.Network
 
         private readonly IConfig _config;
 
+        private readonly P2PClientCollection _clientCollection;
+
         public override string ListenerType { get; } = "P2P";
 
-        public P2PListener(ITaskAwaiter taskAwaiter, IConfig config) : base(IPAddress.Parse(config.P2PListenerIp), config.P2PListenerPort, config.UniversalPlugAndPlay)
+        public P2PListener(ITaskAwaiter taskAwaiter, IConfig config, P2PClientCollection clientCollection) : base(IPAddress.Parse(config.P2PListenerIp), config.P2PListenerPort, config.UniversalPlugAndPlay)
         {
             _taskAwaiter = taskAwaiter;
             _config = config;
+            _clientCollection = clientCollection;
         }
 
         protected override void AfterStart()
@@ -31,7 +36,14 @@ namespace Tuckfirtle.Node.Network
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var tcpClient = await tcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
-                    // TODO: Add tcpclient into a collection which handles this.
+                    
+                    TaskState.RunAndForget((tcpClient, _clientCollection, _config), state =>
+                    {
+                        var (stateTcpClient, clientCollection, config) = state;
+
+                        if (!clientCollection.TryAddNewPeer(new P2PClient(config, stateTcpClient)))
+                            stateTcpClient.Close();
+                    }, cancellationToken);
                 }
             });
         }
