@@ -66,6 +66,9 @@ namespace Tuckfirtle.Node.Network
 
         public void Close()
         {
+            if (_isDisposed)
+                return;
+
             BeforeClose();
             _cancellationTokenSource.Cancel();
             Task.WaitAll(_tcpClientReaderTask);
@@ -138,10 +141,11 @@ namespace Tuckfirtle.Node.Network
             _tcpClientReaderTask = TaskState.Run<(CancellationTokenSource, Action, Func<CancellationToken, Task<bool>>), Task>((_cancellationTokenSource, Dispose, ReadPacketsFromNetworkAsync), async state =>
             {
                 var (cancellationTokenSource, dispose, readPacketsFromNetworkAsync) = state;
+                var cancellationToken = cancellationTokenSource.Token;
 
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
-                    var packetResult = await readPacketsFromNetworkAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+                    var packetResult = await readPacketsFromNetworkAsync(cancellationToken).ConfigureAwait(false);
 
                     if (packetResult)
                         continue;

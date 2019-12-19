@@ -7,15 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Google.Protobuf;
 using Open.Nat;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
 using Tuckfirtle.Core;
-using Tuckfirtle.Core.Network.P2P;
-using Tuckfirtle.Core.Network.P2P.Packets;
 using Tuckfirtle.Node.Config;
-using Tuckfirtle.Node.Network.Clients;
 
 namespace Tuckfirtle.Node.Network
 {
@@ -89,12 +85,6 @@ namespace Tuckfirtle.Node.Network
                     listener.Logger += ListenerOnLogger;
                     listener.Start();
                 }
-
-                var test = new P2PClient(config);
-                await test.ConnectAsync("116.89.53.178", config.P2PListenerPort).ConfigureAwait(false);
-                var packet = await PacketUtility.SerializePacketAsync(new HandshakePacket { HandshakeType = HandshakeType.PublicKey, HandshakeData = ByteString.CopyFrom(1) }, config.NetworkType).ConfigureAwait(false);
-                await test.WritePacketToNetworkAsync(packet).ConfigureAwait(false);
-                test.Close();
             });
         }
 

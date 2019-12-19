@@ -31,18 +31,20 @@ namespace Tuckfirtle.Node.Network.Listeners
         {
             base.AfterStart();
 
-            _taskAwaiter.EnqueueTask(TcpListener, async (cancellationToken, tcpListener) =>
+            _taskAwaiter.EnqueueTask((TcpListener, _config.NetworkType, _clientCollection), async (cancellationToken, state) =>
             {
+                var (tcpListener, networkType, clientCollection) = state;
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var tcpClient = await tcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
                     
-                    TaskState.RunAndForget((tcpClient, _clientCollection, _config), state =>
+                    TaskState.RunAndForget((tcpClient, networkType, clientCollection), innerState =>
                     {
-                        var (stateTcpClient, clientCollection, config) = state;
+                        var (innerTcpClient, innerNetworkType, innerClientCollection) = innerState;
 
-                        if (!clientCollection.TryAddNewPeer(new P2PClient(config, stateTcpClient)))
-                            stateTcpClient.Close();
+                        if (!innerClientCollection.TryAddNewPeer(new P2PClient(innerNetworkType, innerTcpClient)))
+                            innerTcpClient.Close();
                     }, cancellationToken);
                 }
             });
