@@ -9,22 +9,23 @@ namespace Tuckfirtle.Node.Config.Json
 {
     internal class JsonConfig : Config
     {
+        private readonly JsonSerializer _jsonSerializer;
+
         public JsonConfig(string configFilePath) : base(configFilePath)
         {
+            _jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings { Formatting = Formatting.Indented });
         }
 
         public override void LoadConfig()
         {
             using var streamReader = new StreamReader(new FileStream(ConfigFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
-            var jsonSerializer = new JsonSerializer();
-            jsonSerializer.Populate(new JsonTextReader(streamReader), this);
+            _jsonSerializer.Populate(new JsonTextReader(streamReader), this);
         }
 
         public override void SaveConfig()
         {
             using var streamWriter = new StreamWriter(new FileStream(ConfigFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
-            var jsonSerializer = new JsonSerializer { Formatting = Formatting.Indented };
-            jsonSerializer.Serialize(streamWriter, this);
+            _jsonSerializer.Serialize(streamWriter, this);
         }
     }
 }

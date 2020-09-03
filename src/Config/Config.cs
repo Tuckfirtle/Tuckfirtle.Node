@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json;
+using Serilog.Events;
 using Tuckfirtle.Core;
 using Tuckfirtle.Core.Network;
 
@@ -13,6 +14,8 @@ namespace Tuckfirtle.Node.Config
 {
     internal abstract class Config : IConfig, IDisposable
     {
+        public LogEventLevel MinimumLogEventLevel { get; set; } = LogEventLevel.Information;
+
         public NetworkType NetworkType { get; set; } = NetworkType.Testnet;
 
         public bool UniversalPlugAndPlay { get; set; } = true;

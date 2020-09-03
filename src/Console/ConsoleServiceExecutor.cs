@@ -7,27 +7,35 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading;
+using Serilog;
+using Serilog.Core;
 using TheDialgaTeam.Core.DependencyInjection;
 using TheDialgaTeam.Core.Logger;
+using TheDialgaTeam.Core.Logger.Formatter;
 using TheDialgaTeam.Core.Tasks;
 using Tuckfirtle.Core;
 using Tuckfirtle.Node.Config;
 
 namespace Tuckfirtle.Node.Console
 {
-    internal class ConsoleServiceExecutor : IServiceExecutor
+    internal class ConsoleServiceExecutor : IServiceExecutor, IDisposable
     {
         private readonly IConfig _config;
 
-        private readonly IConsoleLogger _consoleLogger;
+        private readonly LoggingLevelSwitch _loggingLevelSwitch;
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        public ConsoleServiceExecutor(IConfig config, IConsoleLogger consoleLogger, CancellationTokenSource cancellationTokenSource)
+        private readonly ILogger _logger;
+
+        private bool _isDisposed;
+
+        public ConsoleServiceExecutor(IConfig config, LoggingLevelSwitch loggingLevelSwitch, CancellationTokenSource cancellationTokenSource)
         {
             _config = config;
-            _consoleLogger = consoleLogger;
+            _loggingLevelSwitch = loggingLevelSwitch;
             _cancellationTokenSource = cancellationTokenSource;
+            _logger = new LoggerConfiguration().WriteTo.CustomConsole(new OutputTemplateTextFormatter("{Message}{NewLine}")).CreateLogger();
         }
 
         public void ExecuteService(ITaskAwaiter taskAwaiter)
@@ -38,49 +46,32 @@ namespace Tuckfirtle.Node.Console
             System.Console.Title = $"{CoreConfiguration.CoinFullName} Node v{version} ({frameworkVersion})";
             System.Console.CancelKeyPress += (sender, args) => { args.Cancel = true; };
 
-            _consoleLogger.LogMessage(new ConsoleMessageBuilder()
-                .WriteLine("", false)
-                .WriteLine("████████╗██╗   ██╗ ██████╗██╗  ██╗███████╗██╗██████╗ ████████╗██╗     ███████╗", false)
-                .WriteLine("╚══██╔══╝██║   ██║██╔════╝██║ ██╔╝██╔════╝██║██╔══██╗╚══██╔══╝██║     ██╔════╝", false)
-                .WriteLine("   ██║   ██║   ██║██║     █████╔╝ █████╗  ██║██████╔╝   ██║   ██║     █████╗  ", false)
-                .WriteLine("   ██║   ██║   ██║██║     ██╔═██╗ ██╔══╝  ██║██╔══██╗   ██║   ██║     ██╔══╝  ", false)
-                .WriteLine("   ██║   ╚██████╔╝╚██████╗██║  ██╗██║     ██║██║  ██║   ██║   ███████╗███████╗", false)
-                .WriteLine("   ╚═╝    ╚═════╝  ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝", false)
-                .WriteLine("", false)
-                .Write(" * ", ConsoleColor.Green, false)
-                .Write("ABOUT".PadRight(13), false)
-                .Write($"{CoreConfiguration.CoinFullName} Node/{version} ", ConsoleColor.Cyan, false)
-                .WriteLine(frameworkVersion, false)
-                .Write(" * ", ConsoleColor.Green, false)
-                .Write("COMMANDS".PadRight(13), false)
-                .Write("Type ", false)
-                .Write("help ", ConsoleColor.Magenta, false)
-                .WriteLine("to get a list of commands.", false)
-                .WriteLine("", false)
-                .Build());
+            _logger.Information("");
+            _logger.Information("████████╗██╗   ██╗ ██████╗██╗  ██╗███████╗██╗██████╗ ████████╗██╗     ███████╗");
+            _logger.Information("╚══██╔══╝██║   ██║██╔════╝██║ ██╔╝██╔════╝██║██╔══██╗╚══██╔══╝██║     ██╔════╝");
+            _logger.Information("   ██║   ██║   ██║██║     █████╔╝ █████╗  ██║██████╔╝   ██║   ██║     █████╗  ");
+            _logger.Information("   ██║   ██║   ██║██║     ██╔═██╗ ██╔══╝  ██║██╔══██╗   ██║   ██║     ██╔══╝  ");
+            _logger.Information("   ██║   ╚██████╔╝╚██████╗██║  ██╗██║     ██║██║  ██║   ██║   ███████╗███████╗");
+            _logger.Information("   ╚═╝    ╚═════╝  ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝");
+            _logger.Information("");
+            _logger.Information($" * ABOUT        {CoreConfiguration.CoinFullName} Node/{version}");
+            _logger.Information(" * COMMANDS     Type help to get a list of commands.");
+            _logger.Information("");
 
             if (!File.Exists(_config.ConfigFilePath))
             {
                 _config.SaveConfig();
-
-                _consoleLogger.LogMessage(new ConsoleMessageBuilder()
-                    .WriteLine("Thank you for running a public node! This will help the chain a lot.", false)
-                    .WriteLine("We are now building a configuration file for this node...", false)
-                    .WriteLine($"Generated configuration file is at: \"{_config.ConfigFilePath}\"", false)
-                    .WriteLine("Please ensure that the configuration is correct and run this application again to start the node.", false)
-                    .WriteLine("Press Enter/Return to exit...", false)
-                    .Build());
-
-                System.Console.ReadLine();
-                _cancellationTokenSource.Cancel();
-                return;
+            }
+            else
+            {
+                _config.LoadConfig();
             }
 
-            _config.LoadConfig();
+            _loggingLevelSwitch.MinimumLevel = _config.MinimumLogEventLevel;
 
-            TaskState.RunAndForget((_consoleLogger, _cancellationTokenSource), async state =>
+            TaskState.RunAndForget((_logger, _cancellationTokenSource), async state =>
             {
-                var (consoleLogger, cancellationTokenSource) = state;
+                var (logger, cancellationTokenSource) = state;
 
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
@@ -96,17 +87,30 @@ namespace Tuckfirtle.Node.Console
 
                     if (command.Equals("help", StringComparison.OrdinalIgnoreCase))
                     {
-                        consoleLogger.LogMessage(new ConsoleMessageBuilder()
-                            .WriteLine("Available commands:", false)
-                            .WriteLine("Exit - Signal the node to close. This will properly save the blockchain buffer if there is any.", false)
-                            .Build());
+                        logger.Information("Available commands:");
+                        logger.Information("Exit - Signal the node to close. This will properly save the block chain buffer if there is any.");
                     }
                     else if (command.Equals("exit", StringComparison.OrdinalIgnoreCase))
+                    {
                         cancellationTokenSource.Cancel();
+                    }
                     else
-                        consoleLogger.LogMessage("Invalid command!", ConsoleColor.Red, false);
+                    {
+                        logger.Information("Invalid Command!");
+                    }
                 }
             }, _cancellationTokenSource.Token);
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            _isDisposed = true;
+            (_logger as Logger)?.Dispose();
         }
     }
 }

@@ -3,12 +3,15 @@
 // Please see the included LICENSE file for more information.
 
 using System.Collections.Generic;
+using Serilog.Events;
 using Tuckfirtle.Core.Network;
 
 namespace Tuckfirtle.Node.Config
 {
     internal interface IConfig
     {
+        LogEventLevel MinimumLogEventLevel { get; }
+
         NetworkType NetworkType { get; }
 
         bool UniversalPlugAndPlay { get; }

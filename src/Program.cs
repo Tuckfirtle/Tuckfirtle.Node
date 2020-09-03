@@ -4,12 +4,14 @@
 
 using System;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using TheDialgaTeam.Core.DependencyInjection;
-using TheDialgaTeam.Core.Logger;
-using TheDialgaTeam.Core.Logger.DependencyInjection.Installer;
+using Tuckfirtle.Node.Config;
 using Tuckfirtle.Node.Config.Json;
 using Tuckfirtle.Node.Console;
-using Tuckfirtle.Node.Network;
 
 namespace Tuckfirtle.Node
 {
@@ -19,65 +21,68 @@ namespace Tuckfirtle.Node
 
         public static void Main()
         {
-            var logsDirectory = Path.Combine(Environment.CurrentDirectory, "Logs");
+            DependencyManager.InstallService(serviceCollection =>
+            {
+                serviceCollection.AddSingleton<IConfig>(factory => new JsonConfig(Path.Combine(Environment.CurrentDirectory, "config.json")));
+                serviceCollection.AddSingleton<LoggingLevelSwitch>();
+                serviceCollection.AddSingleton<ILogger>(factory =>
+                {
+                    const string outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss}] {Level} {Message}{NewLine}{Exception}";
 
-            if (!Directory.Exists(logsDirectory))
-                Directory.CreateDirectory(logsDirectory);
+                    var logsDirectory = Path.Combine(Environment.CurrentDirectory, "Logs");
 
-            DependencyManager.InstallService(new ConsoleStreamWriteToFileQueueLoggerServiceInstaller(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.log")));
-            DependencyManager.InstallService(new JsonConfigServiceInstaller(Path.Combine(Environment.CurrentDirectory, "Config.json")));
-            DependencyManager.InstallService(new ConsoleServiceInstaller());
-            DependencyManager.InstallService(new NetworkServiceInstaller());
+                    if (!Directory.Exists(logsDirectory))
+                    {
+                        Directory.CreateDirectory(logsDirectory);
+                    }
+
+                    return new LoggerConfiguration()
+                        .MinimumLevel.ControlledBy(factory.GetRequiredService<LoggingLevelSwitch>())
+                        .WriteTo.Console(outputTemplate: outputTemplate)
+                        .WriteTo.Async(configuration => configuration.File(Path.Combine(logsDirectory, "log.log"), outputTemplate: outputTemplate, rollingInterval: RollingInterval.Day, fileSizeLimitBytes: null, retainedFileCountLimit: null), blockWhenFull: true)
+                        .CreateLogger();
+                });
+                serviceCollection.AddSingleton<IServiceExecutor, ConsoleServiceExecutor>();
+            });
 
             DependencyManager.BuildAndExecute((provider, exception) =>
             {
-                var consoleLogger = new ConsoleStreamLogger(System.Console.Error);
-                var fileLogger = new ConsoleStreamLogger(new StreamWriter(new FileStream(Path.Combine(logsDirectory, $"{DateTime.Now:yyyy-MM-dd}.error"), FileMode.Append, FileAccess.Write, FileShare.Read)));
+                const string outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss}] {Level} {Message:lj}{NewLine}{Exception}";
+
+                var logsDirectory = Path.Combine(Environment.CurrentDirectory, "Logs");
+
+                if (!Directory.Exists(logsDirectory))
+                {
+                    Directory.CreateDirectory(logsDirectory);
+                }
+
+                var logger = new LoggerConfiguration()
+                    .WriteTo.Console(outputTemplate: outputTemplate)
+                    .WriteTo.File(Path.Combine(logsDirectory, "error.log"), LogEventLevel.Fatal, outputTemplate)
+                    .CreateLogger();
 
                 if (exception is AggregateException aggregateException)
                 {
-                    var consoleMessages = new ConsoleMessageBuilder();
-
                     foreach (var exInnerException in aggregateException.InnerExceptions)
                     {
                         if (exInnerException is OperationCanceledException)
+                        {
                             continue;
+                        }
 
-                        consoleMessages.WriteLine(exInnerException.ToString(), ConsoleColor.Red);
+                        logger.Fatal(exInnerException, "Unexpected error occured!");
                     }
 
-                    var message = consoleMessages.WriteLine("Press Enter/Return to exit...").Build();
-
-                    if (message.Count > 1)
-                    {
-                        consoleLogger.LogMessage(message);
-                        fileLogger.LogMessage(message);
-                        System.Console.ReadLine();
-                    }
+                    logger.Information("Press Any key to exit...");
+                    System.Console.Read();
                 }
-                else
+                else if (!(exception is OperationCanceledException))
                 {
-                    var consoleMessage = new ConsoleMessageBuilder()
-                        .WriteLine(exception.ToString(), ConsoleColor.Red)
-                        .WriteLine("Press Enter/Return to exit...")
-                        .Build();
-
-                    consoleLogger.LogMessage(consoleMessage);
-                    fileLogger.LogMessage(consoleMessage);
-                    System.Console.ReadLine();
+                    logger.Fatal(exception, "Unexpected error occured!");
+                    logger.Information("Press Any key to exit...");
+                    System.Console.Read();
                 }
-
-                consoleLogger.Dispose();
-                fileLogger.Dispose();
-
-                ExitWithFault();
             });
-        }
-
-        private static void ExitWithFault()
-        {
-            DependencyManager.Dispose();
-            Environment.Exit(1);
         }
     }
 }
