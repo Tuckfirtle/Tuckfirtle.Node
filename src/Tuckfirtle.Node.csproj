@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Tuckfirtle.Node</AssemblyName>
     <RootNamespace>Tuckfirtle.Node</RootNamespace>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <PackageId>Tuckfirtle.Node</PackageId>
     <Version>0.0.1.0</Version>
@@ -14,47 +14,45 @@
     <PackageProjectUrl>https://github.com/tuckfirtle/Tuckfirtle.Node</PackageProjectUrl>
     <RepositoryUrl>https://github.com/tuckfirtle/Tuckfirtle.Node</RepositoryUrl>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>Debug_linux;Release_linux;Debug_osx;Release_osx;Debug_win;Release_win</Configurations>
-    <Platforms>arm;x64;x86</Platforms>
-    <RuntimeIdentifiers>linux-arm;linux-musl-x64;linux-x64;osx-x64;win-arm;win-arm64;win-x64;win-x86</RuntimeIdentifiers>
-    <RuntimeIdentifier>$(Configuration.Replace("Debug_","").Replace("Release_", ""))-$(Platform)</RuntimeIdentifier>
-    <PublishSingleFile>true</PublishSingleFile>
-    <PublishTrimmed>true</PublishTrimmed>
+    <Platforms>AnyCPU;x64;x86;ARM32;ARM64</Platforms>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Debug_linux' OR '$(Configuration)'=='Debug_osx' OR '$(Configuration)'=='Debug_win'">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DefineConstants>DEBUG</DefineConstants>
     <Optimize>false</Optimize>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Release_linux' OR '$(Configuration)'=='Release_osx' OR '$(Configuration)'=='Release_win'">
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <Optimize>true</Optimize>
     <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Network\**" />
-    <EmbeddedResource Remove="Network\**" />
-    <None Remove="Network\**" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="TheDialgaTeam.Core.Logger" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.7" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Serilog" Version="2.9.0" />
-    <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Open.NAT\Open.Nat\Open.Nat.csproj" />
-    <ProjectReference Include="..\..\TheDialgaTeam.Core.DependencyInjection\src\TheDialgaTeam.Core.DependencyInjection.csproj" />
-    <ProjectReference Include="..\..\TheDialgaTeam.Core.Logger\src\TheDialgaTeam.Core.Logger.csproj" />
-    <ProjectReference Include="..\..\TheDialgaTeam.Core.Tasks\src\TheDialgaTeam.Core.Tasks.csproj" />
     <ProjectReference Include="..\..\Tuckfirtle.Core\src\Tuckfirtle.Core.csproj" />
     <ProjectReference Include="..\..\Tuckfirtle.OpenQuantumSafe\src\Tuckfirtle.OpenQuantumSafe.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
